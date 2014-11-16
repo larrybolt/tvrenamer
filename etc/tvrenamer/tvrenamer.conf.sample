@@ -1,0 +1,78 @@
+[DEFAULT]
+
+#
+# From tvrenamer.opts
+#
+
+# Format for naming library directories. (string value)
+#directory_name_format = .
+
+# Practice run where no changes are applied. (boolean value)
+#dryrun = false
+
+# Separator to join multiple episode numbers. (string value)
+#episode_separator = -
+
+# Format for episode numbers. (string value)
+#episode_single = %02d
+
+# File names exclused from processing. (list value)
+#filename_blacklist =
+
+# Characters to ignore within filename. (string value)
+#filename_character_blacklist =
+
+# Format for naming files with episode name. (string value)
+#filename_format_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s - %(episodename)s%(ext)s
+
+# Format for naming files without episode name. (string value)
+#filename_format_no_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s%(ext)s
+
+# List of mappings of string pattern replacements. (list value)
+#input_filename_replacements =
+
+# Mapping of parsed series name to replacement values. (dict value)
+#input_series_replacements =
+
+# Lanuage to lookup metadata in. (string value)
+#language = en
+
+# Base path of library to move renamed files. (string value)
+#library_base_path =
+
+# specify the paths to search for files to rename. (multi valued)
+#locations =
+
+# specific path and filename of logging configuration
+# (override defaults) (string value)
+#logconfig = <None>
+
+# specify name of log file default: %(default)s (string value)
+#logfile = tvrenamer.log
+
+# specify logging level to log messages: %(choices)s (string value)
+#loglevel = info
+
+# Move files to library during rename. (boolean value)
+#move_files_enabled = false
+
+# Format for naming multiple episodes. (string value)
+#multiep_format = %(epname)s (%(episodemin)s-%(episodemax)s)
+
+# Separator to join multiple episodes. (string value)
+#multiep_join_name_with = ", "
+
+# List of mappings of string pattern replacements. (list value)
+#output_filename_replacements =
+
+# Mapping of lookup series name to replacement values. (dict value)
+#output_series_replacements =
+
+# Overwrite existing files during rename. (boolean value)
+#overwrite_file_enabled = false
+
+# Character used to replace invalid characters. (string value)
+#replacement_character = _
+
+# File extensions considered valid. (list value)
+#valid_extensions =
