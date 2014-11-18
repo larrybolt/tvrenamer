@@ -1,7 +1,7 @@
 import copy
 import itertools
+import os
 import re
-import warnings
 
 import six
 
@@ -12,21 +12,6 @@ import six
 # Note that extensions still pass 'valid_extensions' filter,
 # '.eng.srt' passes when 'srt' is specified in 'valid_extensions'.
 EXTENSION_PATTERN = '(\.[a-zA-Z0-9]+)$'
-
-
-def print_out(msg, end=None):
-    """
-    Print to sys.stdout a message
-    """
-    six.print_(msg.encode('utf-8'), end=end)
-
-
-def warn(text, logger=None):
-    """Displays message to sys.stderr
-    """
-    if logger:
-        logger.warning(text)
-    warnings.warn(str(text), RuntimeWarning, stacklevel=2)
 
 
 def make_opt_list(opts, group):
@@ -155,3 +140,42 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
                 return True
     else:
         return False
+
+
+def retrieve_files(locations, logger=None):
+
+    all_files = []
+    for location in locations:
+        # if local path then make sure it is absolute
+        if not location.startswith('\\'):
+            location = os.path.abspath(os.path.expanduser(location))
+
+        if logger:
+            logger.info('searching [%s]', location)
+        for root, dirs, files in os.walk(location):
+            if logger:
+                logger.debug('found file(s) %s', files)
+            all_files.extend([os.path.join(root, name) for name in files])
+
+    return all_files
+
+
+def find_library(series_path, locations, default_location):
+
+    for location in locations:
+        if os.path.isdir(os.path.join(location, series_path)):
+            return location
+        # already tried the full path; now walk down the path
+        segments = series_path.split(os.sep)[:-1]
+        while segments:
+            seg_path = os.path.join(*segments)
+            # if list was just an empty string, break out
+            if not seg_path:
+                break
+            # if the directory exists then we found our location
+            if os.path.isdir(os.path.join(location, seg_path)):
+                return location
+            # remove the last element and try again
+            segments = segments[:-1]
+
+    return default_location

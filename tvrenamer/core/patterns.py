@@ -1,7 +1,5 @@
 import re
 
-from tvrenamer.common import tools
-
 
 # Patterns to parse input filenames with
 FILENAME_PATTERNS = [
@@ -228,8 +226,8 @@ def get_expressions(logger=None):
         try:
             cregex = re.compile(cpattern, re.VERBOSE)
         except re.error as errormsg:
-            tools.warn('WARNING: Invalid episode_pattern (error: %s)\n'
-                       'Pattern:\n%s' % (errormsg, cpattern), logger)
+            logger.warning('Invalid episode_pattern (error: %s) '
+                           'Pattern: %s', errormsg, cpattern)
         else:
             _EXPRESSIONS.append(cregex)
 

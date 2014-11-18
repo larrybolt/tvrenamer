@@ -1,6 +1,6 @@
 from oslotest import base as test_base
 
-from tvrenamer import parser
+from tvrenamer.core import episode
 
 
 class ToolsTest(test_base.BaseTestCase):

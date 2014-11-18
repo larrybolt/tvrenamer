@@ -13,6 +13,9 @@ CLI_OPTS = [
     cfg.BoolOpt('dryrun',
                 default=False,
                 help='Practice run where no changes are applied.'),
+    cfg.BoolOpt('cron',
+                default=False,
+                help='Disable console output when running via cron'),
     cfg.StrOpt('logfile',
                metavar='LOG_FILE',
                default=DEFAULT_LOG_FILENAME,
@@ -30,8 +33,8 @@ CLI_OPTS = [
                         'trace']),
     cfg.StrOpt('logconfig',
                metavar='LOG_CONFIG',
-               help='specific path and filename of logging configuration \
-                    (override defaults)'),
+               help='specific path and filename of logging configuration '
+                    '(override defaults)'),
 ]
 
 cfg.CONF.register_cli_opts(CLI_OPTS)
@@ -44,9 +47,12 @@ EPISODE_OPTS = [
     cfg.BoolOpt('overwrite_file_enabled',
                 default=False,
                 help='Overwrite existing files during rename.'),
-    cfg.StrOpt('library_base_path',
+    cfg.StrOpt('default_library',
                default='',
-               help='Base path of library to move renamed files.'),
+               help='Default library path to relocate files to.'),
+    cfg.ListOpt('libraries',
+                default=[],
+                help='Library paths to relocate files to.'),
     cfg.StrOpt('language',
                default='en',
                help='Lanuage to lookup metadata in.'),

@@ -1,6 +1,6 @@
 from oslotest import base as test_base
 
-from tvrenamer import patterns
+from tvrenamer.core import patterns
 
 
 class ToolsTest(test_base.BaseTestCase):

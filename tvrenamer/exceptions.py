@@ -8,12 +8,6 @@ class BaseTvRenamerException(Exception):
     pass
 
 
-class InvalidPath(BaseTvRenamerException):
-    """Raised when an argument is a non-existent file or directory path
-    """
-    pass
-
-
 class NoValidFilesFoundError(BaseTvRenamerException):
     """Raised when no valid files are found. Effectively exits tvnamer
     """
@@ -22,12 +16,6 @@ class NoValidFilesFoundError(BaseTvRenamerException):
 
 class InvalidFilename(BaseTvRenamerException):
     """Raised when a file is parsed, but no episode info can be found
-    """
-    pass
-
-
-class UserAbort(BaseTvRenamerException):
-    """Base exception for config errors
     """
     pass
 
@@ -64,11 +52,5 @@ class SeasonNotFound(DataRetrievalError):
 
 class EpisodeNotFound(DataRetrievalError):
     """Raised when episode cannot be found
-    """
-    pass
-
-
-class EpisodeNameNotFound(DataRetrievalError):
-    """Raised when the name of the episode cannot be found
     """
     pass

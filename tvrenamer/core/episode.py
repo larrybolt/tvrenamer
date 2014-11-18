@@ -26,16 +26,17 @@ from oslo.config import cfg
 
 from tvrenamer.common import tools
 from tvrenamer import exceptions as exc
-from tvrenamer import formatter
-from tvrenamer import parser
-from tvrenamer import renamer
+from tvrenamer.core import formatter
+from tvrenamer.core import parser
+from tvrenamer.core import renamer
 from tvrenamer.services import tvdb
 
 LOG = logging.getLogger(__name__)
 
 cfg.CONF.import_opt('filename_blacklist', 'tvrenamer.options')
 cfg.CONF.import_opt('input_filename_replacements', 'tvrenamer.options')
-cfg.CONF.import_opt('library_base_path', 'tvrenamer.options')
+cfg.CONF.import_opt('default_library', 'tvrenamer.options')
+cfg.CONF.import_opt('libraries', 'tvrenamer.options')
 cfg.CONF.import_opt('move_files_enabled', 'tvrenamer.options')
 cfg.CONF.import_opt('valid_extensions', 'tvrenamer.options')
 
@@ -199,9 +200,12 @@ class Episode(object):
                                             self.generate_filename()))
 
     def relocate(self):
+        library_base_path = tools.find_library(self.generate_dirname(),
+                                               cfg.CONF.libraries,
+                                               cfg.CONF.default_library)
         renamer.execute_relocate(self.original,
-                                 os.path.join(cfg.CONF.library_base_path,
-                                              self.generate_dirname(),
+                                 os.path.join(library_base_path,
+                                              self.formatted_dirname,
                                               self.generate_filename()))
 
     def execute_rename(self):

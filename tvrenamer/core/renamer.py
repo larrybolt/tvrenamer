@@ -5,8 +5,6 @@ import shutil
 
 from oslo.config import cfg
 
-from tvrenamer.common import tools
-
 LOG = logging.getLogger(__name__)
 
 cfg.CONF.import_opt('dryrun', 'tvrenamer.options')
@@ -21,8 +19,7 @@ def _rename_file(old, new):
         os.utime(new, (stat.st_atime, stat.st_mtime))
     except OSError as ex:
         if ex.errno == errno.EPERM:
-            msg = 'File times not preserved for {0}'.format(new)
-            tools.warn(msg, LOG)
+            LOG.warning('File times not preserved for %s', new)
         else:
             raise
 
@@ -31,9 +28,8 @@ def _check_overwrite_existing(filename, formatted_name):
     if os.path.isfile(formatted_name):
         # If the destination exists, raise exception unless force is True
         if not cfg.CONF.overwrite_file_enabled:
-            msg = 'File {0} already exists not forcefully moving {1}'.format(
-                formatted_name, filename)
-            tools.warn(msg, LOG)
+            LOG.warning('File %s already exists not forcefully moving %s',
+                        formatted_name, filename)
             raise OSError()
 
 
@@ -57,8 +53,9 @@ def execute_relocate(filename, formatted_name):
                 os.makedirs(formatted_dirname)
                 LOG.info('Created directory %s', formatted_dirname)
         except OSError as e:
+            LOG.exception('making library path failed (%s)',
+                          formatted_dirname)
             if e.errno != errno.EEXIST:
-                tools.warn(e, LOG)
                 raise
 
     if os.stat(filename).st_dev == os.stat(formatted_dirname).st_dev:

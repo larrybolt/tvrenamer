@@ -1,7 +1,7 @@
 import logging
 import re
 
-from tvrenamer import patterns
+from tvrenamer.core import patterns
 
 LOG = logging.getLogger(__name__)
 
