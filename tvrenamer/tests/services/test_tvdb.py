@@ -1,11 +1,11 @@
 from oslo.config import fixture as cfg_fixture
-from oslotest import base as test_base
 import tvdb_api
 
 from tvrenamer.services import tvdb
+from tvrenamer.tests import base
 
 
-class TvdbServiceTest(test_base.BaseTestCase):
+class TvdbServiceTest(base.BaseTest):
 
     def setUp(self):
         super(TvdbServiceTest, self).setUp()

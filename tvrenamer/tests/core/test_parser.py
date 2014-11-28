@@ -1,7 +1,6 @@
-from oslotest import base as test_base
-
 from tvrenamer.core import parser
+from tvrenamer.tests import base
 
 
-class ToolsTest(test_base.BaseTestCase):
+class ToolsTest(base.BaseTest):
     pass

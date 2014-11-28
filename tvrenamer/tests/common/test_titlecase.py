@@ -1,9 +1,8 @@
-from oslotest import base as test_base
-
 from tvrenamer.common import titlecase
+from tvrenamer.tests import base
 
 
-class TitlecaseTest(test_base.BaseTestCase):
+class TitlecaseTest(base.BaseTest):
 
     def test_from_all_lower(self):
         self.assertEqual(titlecase('a very simple title'),

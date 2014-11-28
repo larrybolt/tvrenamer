@@ -1,10 +1,12 @@
 import copy
 import itertools
+import logging
 import os
 import re
 
 import six
 
+LOG = logging.getLogger(__name__)
 # Pattern for splitting filenames into basename and extension.
 # Useful for matching subtitles with language codes, for example
 # "extension_pattern": "(\.(eng|cze))?(\.[a-zA-Z0-9]+)$" will split
@@ -142,7 +144,7 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
         return False
 
 
-def retrieve_files(locations, logger=None):
+def retrieve_files(locations):
 
     all_files = []
     for location in locations:
@@ -150,11 +152,9 @@ def retrieve_files(locations, logger=None):
         if not location.startswith('\\'):
             location = os.path.abspath(os.path.expanduser(location))
 
-        if logger:
-            logger.info('searching [%s]', location)
+        LOG.info('searching [%s]', location)
         for root, dirs, files in os.walk(location):
-            if logger:
-                logger.debug('found file(s) %s', files)
+            LOG.debug('found file(s) %s', files)
             all_files.extend([os.path.join(root, name) for name in files])
 
     return all_files

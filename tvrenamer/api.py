@@ -47,7 +47,7 @@ class API(object):
 
     def find_files(self):
 
-        for file in tools.retrieve_files(self.locations, LOG):
+        for file in tools.retrieve_files(self.locations):
             self.episodes.append(episode.Episode(file))
         return any(self.episodes)
 
