@@ -13,12 +13,12 @@ LOG = logging.getLogger(__name__)
 # "foo.eng.srt" into "foo" and ".eng.srt".
 # Note that extensions still pass 'valid_extensions' filter,
 # '.eng.srt' passes when 'srt' is specified in 'valid_extensions'.
-EXTENSION_PATTERN = '(\.[a-zA-Z0-9]+)$'
+# EXTENSION_PATTERN = '(\.[a-zA-Z0-9]+)$'
 
 
 def make_opt_list(opts, group):
-    """
-    Generate a list of tuple containing group, options
+    """Generate a list of tuple containing group, options
+
     :param opts: option lists associated with a group
     :type opts: list
     :param group: name of an option group
@@ -30,7 +30,7 @@ def make_opt_list(opts, group):
     return [(g, copy.deepcopy(o)) for g, o in _opts]
 
 
-def split_extension(filename):
+# def split_extension(filename):
 
     # Pattern for splitting filenames into basename and extension.
     # Useful for matching subtitles with language codes, for example
@@ -38,9 +38,9 @@ def split_extension(filename):
     # "foo.eng.srt" into "foo" and ".eng.srt".
     # Note that extensions still pass 'valid_extensions' filter,
     # '.eng.srt' passes when 'srt' is specified in 'valid_extensions'.
-    base = re.sub(EXTENSION_PATTERN, '', filename)
-    ext = filename.replace(base, '')
-    return base, ext
+    # base = re.sub(EXTENSION_PATTERN, '', filename)
+    # ext = filename.replace(base, '')
+    # return base, ext
 
 
 def apply_replacements(cfile, replacements):
@@ -56,7 +56,8 @@ def apply_replacements(cfile, replacements):
     for rep in replacements:
         if not rep.get('with_extension', False):
             # By default, preserve extension
-            cfile, cext = split_extension(cfile)
+            # cfile, cext = split_extension(cfile)
+            cfile, cext = os.path.splitext(cfile)
         else:
             cfile = cfile
             cext = ''
@@ -73,8 +74,7 @@ def apply_replacements(cfile, replacements):
 
 
 def is_valid_extension(extension, valid_extensions):
-    """Checks if the file extension is blacklisted in valid_extensions
-    """
+    """Checks if the file extension is blacklisted in valid_extensions."""
     if not valid_extensions:
         return True
 
@@ -88,9 +88,9 @@ def is_valid_extension(extension, valid_extensions):
 
 
 def is_blacklisted_filename(filepath, filename, filename_blacklist):
-    """Checks if the filename (optionally excluding extension)
-    matches filename_blacklist
+    """Checks if the filename matches filename_blacklist
 
+    (optionally excluding extension)
     with_blacklist should be a list of strings and/or dicts:
 
     a string, specifying an exact filename to ignore
@@ -115,7 +115,8 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
     if not filename_blacklist:
         return False
 
-    fname, fext = split_extension(filename)
+    # fname, fext = split_extension(filename)
+    fname, fext = os.path.splitext(filename)
 
     for fblacklist in filename_blacklist:
         if isinstance(fblacklist, six.string_types):
@@ -169,9 +170,6 @@ def find_library(series_path, locations, default_location):
         segments = series_path.split(os.sep)[:-1]
         while segments:
             seg_path = os.path.join(*segments)
-            # if list was just an empty string, break out
-            if not seg_path:
-                break
             # if the directory exists then we found our location
             if os.path.isdir(os.path.join(location, seg_path)):
                 return location

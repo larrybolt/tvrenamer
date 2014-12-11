@@ -19,8 +19,9 @@ import six
 
 
 def safe_decode(text, incoming=None, errors='strict'):
-    """Decodes incoming text/bytes string using `incoming` if they're not
-       already unicode.
+    """Decodes incoming text/bytes string
+
+    Using `incoming` if they're not already unicode.
 
     :param incoming: Text's current encoding
     :param errors: Errors handling policy. See here for valid

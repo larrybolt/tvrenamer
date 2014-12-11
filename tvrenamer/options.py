@@ -124,8 +124,8 @@ cfg.CONF.register_opts(FORMAT_OPTS)
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo.config options available in the library.
+
     The returned list includes all oslo.config options which may be registered
     at runtime by the library.
     Each element of the list is a tuple. The first element is the name of the
@@ -137,5 +137,5 @@ def list_opts():
     :returns: a list of (group_name, opts) tuples
     """
     from tvrenamer.common import tools
-    ALL_OPTS = [CLI_OPTS, EPISODE_OPTS, FORMAT_OPTS]
-    return tools.make_opt_list(ALL_OPTS, None)
+    all_opts = [CLI_OPTS, EPISODE_OPTS, FORMAT_OPTS]
+    return tools.make_opt_list(all_opts, None)

@@ -1,56 +1,49 @@
-"""Exceptions used through-out tvrenamer
-"""
+"""Exceptions used through-out tvrenamer."""
 
 
 class BaseTvRenamerException(Exception):
-    """Base exception all tvrenamers exceptions inherit from
-    """
+    """Base exception all tvrenamers exceptions inherit from."""
     pass
 
 
 class NoValidFilesFoundError(BaseTvRenamerException):
-    """Raised when no valid files are found. Effectively exits tvnamer
-    """
+    """Raised when no valid files are found. Effectively exits tvnamer."""
     pass
 
 
 class InvalidFilename(BaseTvRenamerException):
-    """Raised when a file is parsed, but no episode info can be found
-    """
+    """Raised when a file is parsed, but no episode info can be found."""
     pass
 
 
 class BaseConfigError(BaseTvRenamerException):
-    """Base exception for config errors
-    """
+    """Base exception for config errors."""
     pass
 
 
 class ConfigValueError(BaseConfigError):
-    """Raised if the config file is malformed or unreadable
-    """
+    """Raised if the config file is malformed or unreadable."""
     pass
 
 
 class DataRetrievalError(BaseTvRenamerException):
-    """Raised when an error (such as a network problem) prevents tvnamer
+    """Raised when unable to retrieve data.
+
+    An error (such as a network problem) prevents tvnamer
     from being able to retrieve data such as episode name
     """
 
 
 class ShowNotFound(DataRetrievalError):
-    """Raised when a show cannot be found
-    """
+    """Raised when a show cannot be found."""
     pass
 
 
 class SeasonNotFound(DataRetrievalError):
-    """Raised when requested season cannot be found
-    """
+    """Raised when requested season cannot be found."""
     pass
 
 
 class EpisodeNotFound(DataRetrievalError):
-    """Raised when episode cannot be found
-    """
+    """Raised when episode cannot be found."""
     pass

@@ -20,7 +20,7 @@ else:
         def emit(self, record):
             pass
 
-        def createLock(self):
+        def createLock(self):  # noqa
             self.lock = None
 
 logging.getLogger().addHandler(NullHandler())
@@ -72,13 +72,13 @@ def _configure(args):
 
     config_files = []
     virtual_path = os.getenv('VIRTUAL_ENV')
-    CFG_FILE = '{0}.conf'.format(tvrenamer.PROJECT_NAME)
+    cfg_file = '{0}.conf'.format(tvrenamer.PROJECT_NAME)
     # if virtualenv is active; then leverage <virtualenv>/etc
     # and <virtualenv>/etc/<project>
     if virtual_path:
-        config_files.append(os.path.join(virtual_path, 'etc', CFG_FILE))
+        config_files.append(os.path.join(virtual_path, 'etc', cfg_file))
         config_files.append(os.path.join(virtual_path, 'etc',
-                                         tvrenamer.PROJECT_NAME, CFG_FILE))
+                                         tvrenamer.PROJECT_NAME, cfg_file))
 
     config_files.extend(
         cfg.find_config_files(project=tvrenamer.PROJECT_NAME))

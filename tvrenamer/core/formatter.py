@@ -1,3 +1,4 @@
+import os
 import platform
 import re
 # import unicodedata
@@ -6,7 +7,7 @@ from oslo.config import cfg
 import six
 
 from tvrenamer.common import encodeutils
-from tvrenamer.common import titlecase
+from tvrenamer.common import titlecase  # noqa
 from tvrenamer.common import tools
 
 cfg.CONF.import_opt('input_series_replacements', 'tvrenamer.options')
@@ -23,7 +24,9 @@ cfg.CONF.import_opt('output_filename_replacements', 'tvrenamer.options')
 
 
 def _replace_input_series_name(seriesname):
-    """allow specified replacements of series names in cases where default
+    """Performs replacement of series name.
+
+    Allow specified replacements of series names in cases where default
     filenames match the wrong series, e.g. missing year gives wrong answer,
     or vice versa. This helps the TVDB query get the right match.
     """
@@ -34,8 +37,9 @@ def _replace_input_series_name(seriesname):
 
 
 def clean_series_name(seriesname):
-    """Cleans up series name by removing any . and _
-    characters, along with any trailing hyphens.
+    """Cleans up series name.
+
+    By removing any . and _ characters, along with any trailing hyphens.
 
     Is basically equivalent to replacing all _ and . with a
     space, but handles decimal numbers in string, for example:
@@ -47,7 +51,7 @@ def clean_series_name(seriesname):
     """
     if not seriesname:
         return seriesname
-    # TODO: Could this be made to clean "Hawaii.Five-0.2010" into
+    # TODO(xxxx): Could this be made to clean "Hawaii.Five-0.2010" into
     # "Hawaii Five-0 2010"?
     seriesname = re.sub('(\D)[.](\D)', '\\1 \\2', seriesname)
     seriesname = re.sub('(\D)[.]', '\\1 ', seriesname)
@@ -58,8 +62,7 @@ def clean_series_name(seriesname):
 
 
 def _format_episode_numbers(episodenumbers):
-    """Format episode number(s) into string, using configured values
-    """
+    """Format episode number(s) into string, using configured values."""
     if len(episodenumbers) == 1:
         epno = cfg.CONF.episode_single % episodenumbers[0]
     else:
@@ -70,8 +73,7 @@ def _format_episode_numbers(episodenumbers):
 
 
 def _format_episode_name(names):
-    """
-    Takes a list of episode names, formats them into a string.
+    """Takes a list of episode names, formats them into a string.
 
     If two names are supplied, such as "Pilot (1)" and "Pilot (2)", the
     returned string will be "Pilot (1-2)". Note that the first number
@@ -108,8 +110,7 @@ def _format_episode_name(names):
 
 
 def _make_valid_filename(value):
-    """
-    Takes a string and makes it into a valid filename.
+    """Takes a string and makes it into a valid filename.
 
     normalize_unicode replaces accented characters with ASCII equivalent, and
     removes characters that cannot be converted sensibly to ASCII.
@@ -134,7 +135,8 @@ def _make_valid_filename(value):
         value = cfg.CONF.replacement_character + value
 
     # Treat extension seperatly
-    value, extension = tools.split_extension(value)
+    # value, extension = tools.split_extension(value)
+    value, extension = os.path.splitext(value)
 
     # Remove any null bytes
     value = value.replace('\0', '')

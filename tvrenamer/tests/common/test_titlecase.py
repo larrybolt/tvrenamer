@@ -1,4 +1,4 @@
-from tvrenamer.common import titlecase
+from tvrenamer.common import titlecase  # noqa
 from tvrenamer.tests import base
 
 

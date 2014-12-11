@@ -25,10 +25,10 @@ import os
 from oslo.config import cfg
 
 from tvrenamer.common import tools
-from tvrenamer import exceptions as exc
 from tvrenamer.core import formatter
 from tvrenamer.core import parser
 from tvrenamer.core import renamer
+from tvrenamer import exceptions as exc
 from tvrenamer.services import tvdb
 
 LOG = logging.getLogger(__name__)
@@ -120,7 +120,7 @@ class Episode(object):
                 'File {0} is blacklisted.'.format(self.name))
             LOG.info(self.messages[-1])
 
-        _, self.extension = tools.split_extension(self.name)
+        # _, self.extension = tools.split_extension(self.name)
         self.clean_name = tools.apply_replacements(
             self.name, cfg.CONF.input_filename_replacements)
 

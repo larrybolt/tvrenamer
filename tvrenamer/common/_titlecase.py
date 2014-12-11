@@ -28,8 +28,7 @@ MAC_MC = re.compile(r"^([Mm]a?c)(\w+)")
 
 
 def titlecase(text):
-    """
-    Titlecases input text
+    """Titlecases input text
 
     This filter changes all words to Title Caps, and attempts to be clever
     about *un*capitalizing SMALL words like a/an/the in the input.
