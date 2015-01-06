@@ -135,7 +135,6 @@ def _make_valid_filename(value):
         value = cfg.CONF.replacement_character + value
 
     # Treat extension seperatly
-    # value, extension = tools.split_extension(value)
     value, extension = os.path.splitext(value)
 
     # Remove any null bytes

@@ -14,11 +14,35 @@ class ToolsTest(base.BaseTest):
         results = tools.make_opt_list(options, group_name)
         self.assertEqual(results, [('test', ['x', 'y', 'z', 'v'])])
 
-    def test_split_extension(self):
-        pass
-
     def test_apply_replacements(self):
-        pass
+        self.assertEqual('sample.avi',
+                         tools.apply_replacements('sample.avi', None))
+        self.assertEqual('sample.avi',
+                         tools.apply_replacements('sample.avi', {}))
+
+        reps = [{'match': '_test',
+                 'replacement': '',
+                 'with_extension': False,
+                 'is_regex': False},
+                ]
+        self.assertEqual('sample.avi',
+                         tools.apply_replacements('sample_test.avi', reps))
+
+        reps = [{'match': '_test',
+                 'replacement': '',
+                 'with_extension': True,
+                 'is_regex': False},
+                ]
+        self.assertEqual('sample.avi',
+                         tools.apply_replacements('sample_test.avi', reps))
+
+        reps = [{'match': '[ua]+',
+                 'replacement': 'x',
+                 'with_extension': False,
+                 'is_regex': True},
+                ]
+        self.assertEqual('sxmple_test.avi',
+                         tools.apply_replacements('sample_test.avi', reps))
 
     def test_is_valid_extension(self):
         valids = ['.avi', '.mp4', '.mkv', 'mpg']
@@ -35,7 +59,65 @@ class ToolsTest(base.BaseTest):
         self.assertTrue(tools.is_valid_extension('.mov', None))
 
     def test_is_blacklisted_filename(self):
-        pass
+        self.assertFalse(tools.is_blacklisted_filename(None, None, None))
+
+        self.assertFalse(tools.is_blacklisted_filename(None,
+                                                       'test.avi',
+                                                       ['readme.txt',
+                                                        '.DS_File']))
+
+        self.assertTrue(tools.is_blacklisted_filename(None,
+                                                      '.DS_File',
+                                                      ['readme.txt',
+                                                       '.DS_File']))
+
+        blacklist = [{'full_path': '',
+                      'exclude_extension': False,
+                      'is_regex': False,
+                      'match': '.DS_File'}]
+        self.assertTrue(tools.is_blacklisted_filename(None,
+                                                      '.DS_File',
+                                                      blacklist))
+
+        blacklist = [{'full_path': '',
+                      'exclude_extension': True,
+                      'is_regex': False,
+                      'match': '.DS_File'}]
+        self.assertTrue(tools.is_blacklisted_filename(None,
+                                                      '.DS_File',
+                                                      blacklist))
+
+        blacklist = [{'full_path': '',
+                      'exclude_extension': True,
+                      'is_regex': False,
+                      'match': '.DS_File'}]
+        self.assertFalse(tools.is_blacklisted_filename(None,
+                                                       'sample.avi',
+                                                       blacklist))
+
+        blacklist = [{'full_path': True,
+                      'exclude_extension': True,
+                      'is_regex': False,
+                      'match': '.DS_File'}]
+        self.assertFalse(tools.is_blacklisted_filename('/tmp/sample.avi',
+                                                       'sample.avi',
+                                                       blacklist))
+
+        blacklist = [{'full_path': '',
+                      'exclude_extension': True,
+                      'is_regex': True,
+                      'match': '.*fake.*'}]
+        self.assertTrue(tools.is_blacklisted_filename(None,
+                                                      'test_fake.avi',
+                                                      blacklist))
+
+        blacklist = [{'full_path': '',
+                      'exclude_extension': True,
+                      'is_regex': True,
+                      'match': '.*fake.*'}]
+        self.assertFalse(tools.is_blacklisted_filename(None,
+                                                       'sample.avi',
+                                                       blacklist))
 
     def test_retrieve_files(self):
         with mock.patch.object(os, 'walk',

@@ -30,19 +30,6 @@ def make_opt_list(opts, group):
     return [(g, copy.deepcopy(o)) for g, o in _opts]
 
 
-# def split_extension(filename):
-
-    # Pattern for splitting filenames into basename and extension.
-    # Useful for matching subtitles with language codes, for example
-    # "extension_pattern": "(\.(eng|cze))?(\.[a-zA-Z0-9]+)$" will split
-    # "foo.eng.srt" into "foo" and ".eng.srt".
-    # Note that extensions still pass 'valid_extensions' filter,
-    # '.eng.srt' passes when 'srt' is specified in 'valid_extensions'.
-    # base = re.sub(EXTENSION_PATTERN, '', filename)
-    # ext = filename.replace(base, '')
-    # return base, ext
-
-
 def apply_replacements(cfile, replacements):
     """Applies custom replacements.
 
@@ -56,7 +43,6 @@ def apply_replacements(cfile, replacements):
     for rep in replacements:
         if not rep.get('with_extension', False):
             # By default, preserve extension
-            # cfile, cext = split_extension(cfile)
             cfile, cext = os.path.splitext(cfile)
         else:
             cfile = cfile
@@ -115,15 +101,13 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
     if not filename_blacklist:
         return False
 
-    # fname, fext = split_extension(filename)
     fname, fext = os.path.splitext(filename)
 
     for fblacklist in filename_blacklist:
         if isinstance(fblacklist, six.string_types):
             if filename == fblacklist:
                 return True
-            else:
-                continue
+            continue  # pragma: no cover
 
         if fblacklist.get('full_path'):
             to_check = filepath
@@ -134,12 +118,10 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
                 to_check = filename
 
         if fblacklist.get('is_regex', False):
-            m = re.match(fblacklist['match'], to_check)
-            if m is not None:
+            if re.match(fblacklist['match'], to_check) is not None:
                 return True
         else:
-            m = fblacklist['match'] in to_check
-            if m:
+            if fblacklist['match'] in to_check:
                 return True
     else:
         return False
