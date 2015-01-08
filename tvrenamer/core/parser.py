@@ -6,34 +6,10 @@ from tvrenamer.core import patterns
 LOG = logging.getLogger(__name__)
 
 
-def _get_series_name(match, namedgroups):
-    if 'seriesname' in namedgroups:
-        return match.group('seriesname')
-    return None
-
-
 def _get_season_no(match, namedgroups):
     if 'seasonnumber' in namedgroups:
         return int(match.group('seasonnumber'))
     return 1
-
-
-def _get_extra_values(match):
-    extra_values = match.groupdict()
-    if extra_values is None:
-        extra_values = {}
-    return extra_values
-
-
-def _get_episode_by_listed(match, namedgroups):
-    # Multiple episodes, have episodenumber1 or 2 etc
-    episode_numbers = []
-    for cur in namedgroups:
-        epnomatch = re.match('episodenumber(\d+)', cur)
-        if epnomatch:
-            episode_numbers.append(int(match.group(cur)))
-    episode_numbers.sort()
-    return episode_numbers
 
 
 def _get_episode_by_boundary(match):
@@ -55,19 +31,22 @@ def _get_episode_by_boundary(match):
 
 def _get_episodes(match, namedgroups):
 
-    if 'episodenumber1' in namedgroups:
-        return _get_episode_by_listed(match, namedgroups)
-    elif 'episodenumberstart' in namedgroups:
+    if 'episodenumberstart' in namedgroups:
         return _get_episode_by_boundary(match)
-    elif 'episodenumber' in namedgroups:
-        return [int(match.group('episodenumber')), ]
     else:
-        return None
+        return [int(match.group('episodenumber')), ]
 
 
 def parse_filename(filename):
+    """Parse media filename for metadata.
 
-    _patterns = patterns.get_expressions(LOG)
+    :param str filename: the name of media file
+    :returns: dict of metadata attributes found in filename
+              or None if no matching expression.
+    :rtype: dict
+    """
+
+    _patterns = patterns.get_expressions()
 
     for cmatcher in _patterns:
         match = cmatcher.match(filename)
@@ -76,9 +55,8 @@ def parse_filename(filename):
 
             result = {}
             result['pattern'] = cmatcher.pattern
-            result['series_name'] = _get_series_name(match, namedgroups)
+            result['series_name'] = match.group('seriesname')
             result['season_number'] = _get_season_no(match, namedgroups)
-            result['extra_values'] = _get_extra_values(match)
             result['episode_numbers'] = _get_episodes(match, namedgroups)
             return result
     else:

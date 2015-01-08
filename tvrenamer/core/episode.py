@@ -56,7 +56,6 @@ class Episode(object):
         self.episode_numbers = None
         self.season_number = None
         self.series_name = None
-        self.extra_values = None
         self.episode_names = None
 
         self.formatted_filename = None
@@ -159,7 +158,6 @@ class Episode(object):
         else:
             self.series_name = formatter.clean_series_name(self.series_name)
 
-        self.extra_values = output.get('extra_values')
         self.season_number = output.get('season_number')
 
     def enhance(self):
@@ -184,7 +182,7 @@ class Episode(object):
         self.formatted_filename = formatter.format_filename(
             self.series_name, self.season_number,
             self.episode_numbers, self.episode_names,
-            self.extra_values, self.extension)
+            self.extension)
         return self.formatted_filename
 
     def generate_dirname(self):

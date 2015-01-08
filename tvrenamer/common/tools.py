@@ -7,13 +7,6 @@ import re
 import six
 
 LOG = logging.getLogger(__name__)
-# Pattern for splitting filenames into basename and extension.
-# Useful for matching subtitles with language codes, for example
-# "extension_pattern": "(\.(eng|cze))?(\.[a-zA-Z0-9]+)$" will split
-# "foo.eng.srt" into "foo" and ".eng.srt".
-# Note that extensions still pass 'valid_extensions' filter,
-# '.eng.srt' passes when 'srt' is specified in 'valid_extensions'.
-# EXTENSION_PATTERN = '(\.[a-zA-Z0-9]+)$'
 
 
 def make_opt_list(opts, group):
@@ -33,9 +26,32 @@ def make_opt_list(opts, group):
 def apply_replacements(cfile, replacements):
     """Applies custom replacements.
 
+    mapping(dict), where each dict contains:
+        'match' - filename match pattern to check against, the filename
+        replacement is applied.
+
+        'replacement' - string used to replace the matched part of the filename
+
+        'is_regex' - if True, the pattern is treated as a
+        regex. If False, simple substring check is used (if
+        'match' in filename). Default is False
+
+        'with_extension' - if True, the file extension is not included in the
+        pattern matching. Default is False
+
+    Example replacements::
+
+        {'match': ':',
+         'replacement': '-',
+         'is_regex': False,
+         'with_extension': False,
+         }
+
     :param str cfile: name of a file
-    :param list replacements: mapping(dict) of 'match', 'replacement',
-                              and 'is_regex' (optional)
+    :param list replacements: mapping(dict) filename pattern matching
+                              directives
+    :returns: formatted filename
+    :rtype: str
     """
     if not replacements:
         return cfile
@@ -60,7 +76,14 @@ def apply_replacements(cfile, replacements):
 
 
 def is_valid_extension(extension, valid_extensions):
-    """Checks if the file extension is blacklisted in valid_extensions."""
+    """Checks if the file extension is blacklisted in valid_extensions.
+
+    :param str extension: a file extension to check
+    :param list valid_extensions: a list of file extensions considered valid
+    :returns: flag indicating if the extension is valid based on list of
+              valid extensions.
+    :rtype: bool
+    """
     if not valid_extensions:
         return True
 
@@ -76,26 +99,32 @@ def is_valid_extension(extension, valid_extensions):
 def is_blacklisted_filename(filepath, filename, filename_blacklist):
     """Checks if the filename matches filename_blacklist
 
-    (optionally excluding extension)
-    with_blacklist should be a list of strings and/or dicts:
+    blacklist is a list of filenames(str) and/or file patterns(dict)
 
-    a string, specifying an exact filename to ignore
-    "filename_blacklist": [".DS_Store", "Thumbs.db"],
+    string, specifying an exact filename to ignore
+    [".DS_Store", "Thumbs.db"]
 
-    a dictionary, where each dict contains:
+    mapping(dict), where each dict contains:
+        'match' - (if the filename matches the pattern, the filename
+        is blacklisted)
 
-    Key 'match' - (if the filename matches the pattern, the filename
-    is blacklisted)
+        'is_regex' - if True, the pattern is treated as a
+        regex. If False, simple substring check is used (if
+        'match' in filename). Default is False
 
-    Key 'is_regex' - if True, the pattern is treated as a
-    regex. If False, simple substring check is used (if
-    cur['match'] in filename). Default is False
+        'full_path' - if True, full path is checked. If False, only
+        filename is checked. Default is False.
 
-    Key 'full_path' - if True, full path is checked. If False, only
-    filename is checked. Default is False.
+        'exclude_extension' - if True, the extension is removed
+        from the file before checking. Default is False.
 
-    Key 'exclude_extension' - if True, the extension is removed
-    from the file before checking. Default is False.
+    :param str filepath: an absolute path and filename to check against
+                         the blacklist
+    :param str filename: name of a file to check against the blacklist
+    :param list filename_blacklist: filename(s) or a mapping(dict) for
+                                    matching file patterns.
+    :returns: flag indicating if the file was matched in the blacklist
+    :rtype: bool
     """
 
     if not filename_blacklist:
@@ -128,6 +157,14 @@ def is_blacklisted_filename(filepath, filename, filename_blacklist):
 
 
 def retrieve_files(locations):
+    """Get list of files found in provided locations.
+
+    Search through the paths provided to find files for processing.
+
+    :param list locations: directories to search
+    :returns: absolute path of filename
+    :rtype: list
+    """
 
     all_files = []
     for location in locations:
@@ -144,6 +181,12 @@ def retrieve_files(locations):
 
 
 def find_library(series_path, locations, default_location):
+    """Search for the location of a series within the library.
+
+    :param str series_path: name of the relative path of the series
+    :param list locations: root path of media libraries
+    :param str default_location: root path of the default media library
+    """
 
     for location in locations:
         if os.path.isdir(os.path.join(location, series_path)):

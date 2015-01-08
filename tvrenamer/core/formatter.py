@@ -1,7 +1,6 @@
 import os
 import platform
 import re
-# import unicodedata
 
 from oslo.config import cfg
 import six
@@ -176,8 +175,6 @@ def _make_valid_filename(value):
 
     # Replace accented characters with ASCII equivalent
     value = encodeutils.safe_encode(value, encoding='ascii', errors='ignore')
-    # value = unicodedata.normalize('NFKD',
-    #                               six.u(value)).encode('ascii', 'ignore')
 
     # Truncate filenames to valid/sane length.
     # NTFS is limited to 255 characters, HFS+ and EXT3 don't seem to have
@@ -201,7 +198,7 @@ def _make_valid_filename(value):
 
 def format_filename(series_name, season_number,
                     episode_numbers, episode_names,
-                    extra_values, extension):
+                    extension):
 
     epdata = {
         'seriesname': series_name,
@@ -210,10 +207,6 @@ def format_filename(series_name, season_number,
         'episodename': _format_episode_name(episode_names),
         'ext': extension,
         }
-
-    extras = extra_values.copy()
-    extras.update(epdata)
-    epdata = extras
 
     if episode_names:
         _format = cfg.CONF.filename_format_ep
