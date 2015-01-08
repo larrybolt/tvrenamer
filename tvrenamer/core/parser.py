@@ -1,5 +1,4 @@
 import logging
-import re
 
 from tvrenamer.core import patterns
 
