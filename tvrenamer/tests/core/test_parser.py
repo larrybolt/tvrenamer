@@ -2,7 +2,7 @@ from tvrenamer.core import parser
 from tvrenamer.tests import base
 
 
-class ToolsTest(base.BaseTest):
+class ParserTest(base.BaseTest):
 
     def test_parse_filename(self):
         fname = 'Sample-Show.S02E15'

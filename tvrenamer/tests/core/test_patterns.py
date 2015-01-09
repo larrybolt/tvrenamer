@@ -2,7 +2,7 @@ from tvrenamer.core import patterns
 from tvrenamer.tests import base
 
 
-class ToolsTest(base.BaseTest):
+class PatternsTest(base.BaseTest):
 
     def test_get_expressions(self):
         exprs = patterns.get_expressions()

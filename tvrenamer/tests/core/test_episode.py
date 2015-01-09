@@ -2,5 +2,5 @@ from tvrenamer.core import episode
 from tvrenamer.tests import base
 
 
-class ToolsTest(base.BaseTest):
+class EpisodeTest(base.BaseTest):
     pass
