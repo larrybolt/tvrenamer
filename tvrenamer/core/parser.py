@@ -1,8 +1,4 @@
-import logging
-
 from tvrenamer.core import patterns
-
-LOG = logging.getLogger(__name__)
 
 
 def _get_season_no(match, namedgroups):
@@ -16,16 +12,10 @@ def _get_episode_by_boundary(match):
     # Multiple episodes, regex specifies start and end number
     start = int(match.group('episodenumberstart'))
     end = int(match.group('episodenumberend'))
-    if end - start > 5:
-        LOG.warning('%s episodes detected in file confused by numeric '
-                    'episode name, using first match: %s', end - start, start)
-        return [start]
-    elif start > end:
+    if start > end:
         # Swap start and end
         start, end = end, start
-        return range(start, end + 1)
-    else:
-        return range(start, end + 1)
+    return range(start, end + 1)
 
 
 def _get_episodes(match, namedgroups):

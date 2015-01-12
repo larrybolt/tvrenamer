@@ -12,7 +12,6 @@ from tvrenamer.common import tools
 cfg.CONF.import_opt('input_series_replacements', 'tvrenamer.options')
 cfg.CONF.import_opt('directory_name_format', 'tvrenamer.options')
 cfg.CONF.import_opt('filename_format_ep', 'tvrenamer.options')
-cfg.CONF.import_opt('filename_format_no_ep', 'tvrenamer.options')
 cfg.CONF.import_opt('episode_single', 'tvrenamer.options')
 cfg.CONF.import_opt('episode_separator', 'tvrenamer.options')
 cfg.CONF.import_opt('multiep_join_name_with', 'tvrenamer.options')
@@ -111,13 +110,13 @@ def _format_episode_name(names):
 def _make_valid_filename(value):
     """Takes a string and makes it into a valid filename.
 
-    normalize_unicode replaces accented characters with ASCII equivalent, and
+    replaces accented characters with ASCII equivalent, and
     removes characters that cannot be converted sensibly to ASCII.
 
-    custom_blacklist specifies additional characters that will removed. This
+    additional characters that will removed. This
     will not touch the extension separator:
 
-        >>> _make_valid_filename("T.est.avi", custom_blacklist=".")
+        >>> _make_valid_filename("T.est.avi")
         'T_est.avi'
     """
 
@@ -143,15 +142,14 @@ def _make_valid_filename(value):
     if sysname == 'Darwin':
         # : is technically allowed, but Finder will treat it as / and will
         # generally cause weird behaviour, so treat it as invalid.
-        blacklist = r"/:"
+        blacklist = r'/:'
     elif sysname in ['Linux', 'FreeBSD']:
-        blacklist = r"/"
+        blacklist = r'/'
     else:
         # platform.system docs say it could also return "Windows" or "Java".
         # Failsafe and use Windows sanitisation for Java, as it could be any
         # operating system.
-        # blacklist = r"\/:*?\"<>|"
-        blacklist = r"\/:*\"<>|"
+        blacklist = r'\/:*?\"<>|'
 
     # Append custom blacklisted characters
     blacklist += cfg.CONF.filename_character_blacklist
@@ -208,26 +206,18 @@ def format_filename(series_name, season_number,
         'ext': extension,
         }
 
-    if episode_names:
-        _format = cfg.CONF.filename_format_ep
-    else:
-        _format = cfg.CONF.filename_format_no_ep
-
-    value = tools.apply_replacements(titlecase(_format % epdata),
-                                     cfg.CONF.output_filename_replacements)
+    value = tools.apply_replacements(
+        titlecase(cfg.CONF.filename_format_ep % epdata),
+        cfg.CONF.output_filename_replacements)
 
     return _make_valid_filename(value)
 
 
-def format_dirname(series_name, season_number,
-                   episode_numbers, orig_filename):
+def format_dirname(series_name, season_number):
 
     data = {
         'seriesname': _make_valid_filename(series_name),
         'seasonnumber': season_number,
-        'episodenumbers': _make_valid_filename(
-            _format_episode_numbers(episode_numbers)),
-        'originalfilename': orig_filename,
         }
 
     return titlecase(cfg.CONF.directory_name_format % data)

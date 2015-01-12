@@ -94,9 +94,6 @@ FORMAT_OPTS = [
     cfg.StrOpt('filename_format_ep',
                default='%(seriesname)s - %(seasonnumber)02dx%(episode)s - %(episodename)s%(ext)s',  # noqa
                help='Format for naming files with episode name.'),
-    cfg.StrOpt('filename_format_no_ep',
-               default='%(seriesname)s - %(seasonnumber)02dx%(episode)s%(ext)s',  # noqa
-               help='Format for naming files without episode name.'),
     cfg.StrOpt('episode_single',
                default='%02d',
                help='Format for episode numbers.'),

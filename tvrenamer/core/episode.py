@@ -187,23 +187,22 @@ class Episode(object):
 
     def generate_dirname(self):
         self.formatted_dirname = formatter.format_dirname(
-            self.series_name, self.season_number,
-            self.episode_numbers, self.name)
+            self.series_name, self.season_number)
         return self.formatted_dirname
 
     def rename(self):
-        renamer.execute_rename(self.original,
-                               os.path.join(self.location,
-                                            self.generate_filename()))
+        renamer.execute(self.original,
+                        os.path.join(self.location,
+                                     self.generate_filename()))
 
     def relocate(self):
         library_base_path = tools.find_library(self.generate_dirname(),
                                                cfg.CONF.libraries,
                                                cfg.CONF.default_library)
-        renamer.execute_relocate(self.original,
-                                 os.path.join(library_base_path,
-                                              self.formatted_dirname,
-                                              self.generate_filename()))
+        renamer.execute(self.original,
+                        os.path.join(library_base_path,
+                                     self.formatted_dirname,
+                                     self.generate_filename()))
 
     def execute_rename(self):
         if cfg.CONF.move_files_enabled:
