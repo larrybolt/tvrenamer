@@ -80,21 +80,21 @@ class FormatterTest(base.BaseTest):
             # / (all OS)
             name = 'person.of.interest.s04/e10.x264/-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                            'person.of.interest.s04_e10.x264_-w4f.mp4')
+                             'person.of.interest.s04_e10.x264_-w4f.mp4')
 
         with mock.patch.object(formatter.platform, 'system',
                                return_value='Linux'):
             # / (all OS)
             name = 'person.of.interest.s04/e10.x264/-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                            'person.of.interest.s04_e10.x264_-w4f.mp4')
+                             'person.of.interest.s04_e10.x264_-w4f.mp4')
 
         with mock.patch.object(formatter.platform, 'system',
                                return_value='Darwin'):
             # / (all OS)
             name = 'person.of.interest.s04/e10.x264/-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                            'person.of.interest.s04_e10.x264_-w4f.mp4')
+                             'person.of.interest.s04_e10.x264_-w4f.mp4')
 
             # :
             name = 'person.of.interest:.s04e10:.x264-w4f.mp4'
@@ -106,12 +106,12 @@ class FormatterTest(base.BaseTest):
             # / (all OS)
             name = 'person.of.interest.s04/e10.x264/-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                           'person.of.interest.s04_e10.x264_-w4f.mp4')
+                             'person.of.interest.s04_e10.x264_-w4f.mp4')
 
             # :
             name = 'person.of.interest:.s04e10:.x264-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                            'person.of.interest_.s04e10_.x264-w4f.mp4')
+                             'person.of.interest_.s04e10_.x264-w4f.mp4')
 
             # *
             name = 'person.of.interest*.s04e10*.x264-w4f.mp4'
@@ -121,7 +121,7 @@ class FormatterTest(base.BaseTest):
             # ?
             name = 'person.of.interest?.s04e10?.x264-w4f.mp4'
             self.assertEqual(formatter._make_valid_filename(name),
-                            'person.of.interest_.s04e10_.x264-w4f.mp4')
+                             'person.of.interest_.s04e10_.x264-w4f.mp4')
 
             # "
             name = 'person.of.interest".s04e10".x264-w4f.mp4'
@@ -146,7 +146,7 @@ class FormatterTest(base.BaseTest):
             # major naming issues
             name = '\\/:*?<Evil>|\"'
             self.assertEqual(formatter._make_valid_filename(name),
-                            '______Evil___')
+                             '______Evil___')
 
             name = 'CON.avi'
             self.assertEqual(formatter._make_valid_filename(name),
@@ -178,7 +178,7 @@ class FormatterTest(base.BaseTest):
                                                    2, [2],
                                                    ['The Codpiece Topology'],
                                                    '.avi'),
-                         'The Big Bang Theory - S02E02-The Codpiece Topology.avi')
+                         'The Big Bang Theory - S02E02-The Codpiece Topology.avi')  # noqa
 
         self.CONF.set_override(
             'filename_format_ep',
