@@ -10,20 +10,7 @@ from six import moves
 
 import tvrenamer
 
-if hasattr(logging, 'NullHandler'):
-    NullHandler = logging.NullHandler
-else:
-    class NullHandler(logging.Handler):
-        def handle(self, record):
-            pass
-
-        def emit(self, record):
-            pass
-
-        def createLock(self):  # noqa
-            self.lock = None
-
-logging.getLogger().addHandler(NullHandler())
+logging.getLogger().addHandler(logging.NullHandler())
 
 DEFAULT_LIBRARY_LOG_LEVEL = {'stevedore': logging.WARNING,
                              'requests': logging.WARNING,
