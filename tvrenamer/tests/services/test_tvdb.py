@@ -1,4 +1,3 @@
-from oslo.config import fixture as cfg_fixture
 import tvdb_api
 
 from tvrenamer.services import tvdb
@@ -9,8 +8,6 @@ class TvdbServiceTest(base.BaseTest):
 
     def setUp(self):
         super(TvdbServiceTest, self).setUp()
-        self.config_fixture = self.useFixture(cfg_fixture.Config())
-        self.config = self.config_fixture.config
         self.api = tvdb.TvdbService()
 
     def test_get_series_by_name(self):
@@ -44,7 +41,8 @@ class TvdbServiceTest(base.BaseTest):
 
         self.assertIsNone(self.api.get_series_name(None))
 
-        self.config(output_series_replacements={'reign (2013)': 'reign'})
+        self.CONF.set_override('output_series_replacements',
+                               {'reign (2013)': 'reign'})
         series, err = self.api.get_series_by_name('reign (2013)')
         self.assertIsNotNone(series)
         self.assertIsNone(err)

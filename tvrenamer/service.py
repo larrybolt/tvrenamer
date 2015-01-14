@@ -60,6 +60,7 @@ def _configure(args):
     config_files = []
     virtual_path = os.getenv('VIRTUAL_ENV')
     cfg_file = '{0}.conf'.format(tvrenamer.PROJECT_NAME)
+
     # if virtualenv is active; then leverage <virtualenv>/etc
     # and <virtualenv>/etc/<project>
     if virtual_path:
@@ -78,9 +79,7 @@ def _configure(args):
 
 
 def prepare_service(args=None):
-    if args is None:
-        args = sys.argv
-    _configure(args[1:])
+    _configure(args)
     _setup_logging()
 
     cfg.CONF.log_opt_values(logging.getLogger(), logging.DEBUG)

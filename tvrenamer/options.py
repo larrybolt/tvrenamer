@@ -33,6 +33,7 @@ CLI_OPTS = [
                         'trace']),
     cfg.StrOpt('logconfig',
                metavar='LOG_CONFIG',
+               default='',
                help='specific path and filename of logging configuration '
                     '(override defaults)'),
 ]

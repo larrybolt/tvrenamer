@@ -21,7 +21,3 @@ def main():
             LOG.info('\tREASON: %s', result.get('messages'))
 
     return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main())

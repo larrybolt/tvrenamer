@@ -4,6 +4,12 @@
 # From tvrenamer.opts
 #
 
+# Disable console output when running via cron (boolean value)
+#cron = false
+
+# Default library path to relocate files to. (string value)
+#default_library =
+
 # Format for naming library directories. (string value)
 #directory_name_format = .
 
@@ -25,9 +31,6 @@
 # Format for naming files with episode name. (string value)
 #filename_format_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s - %(episodename)s%(ext)s
 
-# Format for naming files without episode name. (string value)
-#filename_format_no_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s%(ext)s
-
 # List of mappings of string pattern replacements. (list value)
 #input_filename_replacements =
 
@@ -37,15 +40,15 @@
 # Lanuage to lookup metadata in. (string value)
 #language = en
 
-# Base path of library to move renamed files. (string value)
-#library_base_path =
+# Library paths to relocate files to. (list value)
+#libraries =
 
 # specify the paths to search for files to rename. (multi valued)
 #locations =
 
-# specific path and filename of logging configuration
-# (override defaults) (string value)
-#logconfig = <None>
+# specific path and filename of logging configuration (override
+# defaults) (string value)
+#logconfig =
 
 # specify name of log file default: %(default)s (string value)
 #logfile = tvrenamer.log
