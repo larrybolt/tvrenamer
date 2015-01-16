@@ -29,7 +29,7 @@ from tvrenamer.core import formatter
 from tvrenamer.core import parser
 from tvrenamer.core import renamer
 from tvrenamer import exceptions as exc
-from tvrenamer.services import tvdb
+from tvrenamer import services
 
 LOG = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class Episode(object):
         self.formatted_filename = None
         self.formatted_dirname = None
 
-        self.api = tvdb.TvdbService()
+        self.api = services.get_service()
         self.messages = []
 
     def __str__(self):

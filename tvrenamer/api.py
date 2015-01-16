@@ -16,7 +16,7 @@ class API(object):
 
     def __init__(self):
         service.prepare_service()
-        self.locations = cfg.CONF.locations
+        self.locations = cfg.CONF.locations or []
         self.episodes = []
         self.failed_episodes = []
 

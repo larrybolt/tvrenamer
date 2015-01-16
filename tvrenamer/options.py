@@ -72,6 +72,9 @@ EPISODE_OPTS = [
     cfg.DictOpt('output_series_replacements',
                 default={},
                 help='Mapping of lookup series name to replacement values.'),
+    cfg.StrOpt('lookup_service',
+               default='tvdb',
+               help='Name of lookup service to use for metadata retrieval.'),
     ]
 
 cfg.CONF.register_opts(EPISODE_OPTS)

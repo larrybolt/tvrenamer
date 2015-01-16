@@ -1,7 +1,6 @@
 """Command-line interface to the TvRenamer APIs"""
 
 import logging
-import sys
 
 import six
 
