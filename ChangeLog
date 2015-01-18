@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+0.1a
+----
+
+* added initial AUTHORS and ChangeLog files
 * completed test cases for api, made loading data services done via plugin
 * finished tests for service, added tests for cli, and minor cleanup
 * added test cases for episode, and started test cases for service
