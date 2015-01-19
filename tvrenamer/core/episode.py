@@ -8,13 +8,7 @@ Available actions on the Episode:
     - parse: retrieve information about TV Episode from elements of name
     - enhance: lookup additional information based on parsed elements
     - rename: change the name of file based on most up-to-date info
-    - relocate: change location and name of file based on most up-to-date info
-
-Helper actions:
-
-    - generate_filename: formats a new filename based on info available.
-    - generate_dirname: formats a directory path based on info available.
-    - execute_rename: handles logic on whether to relocate or rename.
+              and optionally change location.
 
 The only input is an absolute path of a filename. Everything is controlled
 via the provided configuration.
@@ -25,6 +19,7 @@ import os
 from oslo.config import cfg
 
 from tvrenamer.common import tools
+from tvrenamer import constants as const
 from tvrenamer.core import formatter
 from tvrenamer.core import parser
 from tvrenamer.core import renamer
@@ -54,15 +49,16 @@ class Episode(object):
         self.clean_name = None
 
         self.episode_numbers = None
+        self.episode_names = None
         self.season_number = None
         self.series_name = None
-        self.episode_names = None
 
         self.formatted_filename = None
         self.formatted_dirname = None
 
         self.api = services.get_service()
         self.messages = []
+        self.state = const.INIT
 
     def __str__(self):
         return ('<{0}>:{1} => [{2} {3}|{4} {5}] '
@@ -82,48 +78,77 @@ class Episode(object):
 
     __repr__ = __str__
 
+    def __call__(self):
+        """Provides ability to perform processing consistently."""
+        try:
+            self.parse()
+            self.enhance()
+            self.rename()
+            self.state = const.DONE
+        except Exception as err:
+            if not isinstance(err, exc.BaseTvRenamerException):
+                LOG.exception('processing exception occurred')
+                self.messages.append(str(err))
+            self.state = const.FAILED
+
+        # just return the final result no matter where processing
+        # has ended.
+        return self.status
+
     @property
     def valid(self):
         if self._valid is not None:
             return self._valid
         return self.validate()
 
-    @valid.setter
-    def valid(self, val):
-        self._valid = val
+    @property
+    def status(self):
+        return {
+            self.original: {
+                'formatted_filename': self.formatted_filename,
+                'progress': self.state,
+                'result': len(self.messages) == 0,
+                'messages': '\n\t'.join(self.messages),
+                }
+            }
 
+    @tools.state(pre=const.PREVALID, post=const.POSTVALID)
     def validate(self):
 
-        self.messages = []
-        self.valid = True
-
         if not os.access(self.original, os.R_OK):
-            self.valid = False
+            self._valid = False
             self.messages.append(
                 'File {0} is not accessible/readable.'.format(
                     self.original))
             LOG.info(self.messages[-1])
+            return self.valid
 
         if not tools.is_valid_extension(self.extension,
                                         cfg.CONF.valid_extensions):
-            self.valid = False
+            self._valid = False
             self.messages.append(
                 'Extension {0} is blacklisted.'.format(self.extension))
             LOG.info(self.messages[-1])
+            return self.valid
 
         if tools.is_blacklisted_filename(self.original,
                                          self.name,
                                          cfg.CONF.filename_blacklist):
-            self.valid = False
+            self._valid = False
             self.messages.append(
                 'File {0} is blacklisted.'.format(self.name))
             LOG.info(self.messages[-1])
+            return self.valid
 
         self.clean_name = tools.apply_replacements(
             self.name, cfg.CONF.input_filename_replacements)
 
+        # if made it to this point then must be valid
+        self._valid = True
+
         return self.valid
 
+    @tools.state(pre=const.PREPARSE, post=const.POSTPARSE)
     def parse(self):
 
         if not self.valid:
@@ -160,6 +185,7 @@ class Episode(object):
 
         self.season_number = output.get('season_number')
 
+    @tools.state(pre=const.PREENHANCE, post=const.POSTENHANCE)
     def enhance(self):
         series, error = self.api.get_series_by_name(self.series_name)
 
@@ -177,37 +203,40 @@ class Episode(object):
             LOG.info(self.messages[-1])
             raise exc.EpisodeNotFound(str(error))
 
-    def generate_filename(self):
+    @tools.state(pre=const.PREFORMAT, post=const.POSTFORMAT)
+    def _format_filename(self):
 
         self.formatted_filename = formatter.format_filename(
             self.series_name, self.season_number,
             self.episode_numbers, self.episode_names,
             self.extension)
+
         return self.formatted_filename
 
-    def generate_dirname(self):
+    def _format_dirname(self):
         self.formatted_dirname = formatter.format_dirname(
             self.series_name, self.season_number)
         return self.formatted_dirname
 
-    def rename(self):
+    def _rename_local(self):
         renamer.execute(self.original,
                         os.path.join(self.location,
-                                     self.generate_filename()))
+                                     self._format_filename()))
 
-    def relocate(self):
-        library_base_path = tools.find_library(self.generate_dirname(),
+    def _rename_remote(self):
+        library_base_path = tools.find_library(self._format_dirname(),
                                                cfg.CONF.libraries,
                                                cfg.CONF.default_library)
         renamer.execute(self.original,
                         os.path.join(library_base_path,
                                      self.formatted_dirname,
-                                     self.generate_filename()))
+                                     self._format_filename()))
 
-    def execute_rename(self):
+    @tools.state(pre=const.PRENAME, post=const.POSTNAME)
+    def rename(self):
         if cfg.CONF.move_files_enabled:
-            self.relocate()
+            self._rename_remote()
             LOG.debug('relocated: %s', self)
         else:
-            self.rename()
+            self._rename_local()
             LOG.debug('renamed: %s', self)

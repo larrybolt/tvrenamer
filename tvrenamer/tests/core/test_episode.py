@@ -59,7 +59,7 @@ class EpisodeTest(base.BaseTest):
         self.assertEqual(ep.season_number, 4)
 
         ep = episode.Episode(self.media)
-        ep.valid = False
+        ep._valid = False
         self.assertRaises(exc.NoValidFilesFoundError, ep.parse)
 
         ep = episode.Episode(self.media)
@@ -111,35 +111,35 @@ class EpisodeTest(base.BaseTest):
         ep.season_number = 4
         ep.episode_numbers = [12]
         ep.episode_names = ['Madness']
-        self.assertEqual(ep.generate_filename(),
+        self.assertEqual(ep._format_filename(),
                          'Revenge - 04x12 - Madness.mp4')
         self.CONF.set_override(
             'filename_format_ep',
             'S%(seasonnumber)02dE%(episode)s-%(episodename)s%(ext)s')
-        self.assertEqual(ep.generate_filename(), 'S04E12-Madness.mp4')
+        self.assertEqual(ep._format_filename(), 'S04E12-Madness.mp4')
 
     def test_gen_dirname(self):
         ep = episode.Episode(self.media)
         ep.series_name = 'Revenge'
         ep.season_number = 4
-        self.assertEqual(ep.generate_dirname(), '.')
+        self.assertEqual(ep._format_dirname(), '.')
         self.CONF.set_override('directory_name_format',
                                '%(seriesname)s/Season %(seasonnumber)02d')
-        self.assertEqual(ep.generate_dirname(), 'Revenge/Season 04')
+        self.assertEqual(ep._format_dirname(), 'Revenge/Season 04')
 
-    def test_rename(self):
+    def test_rename_local(self):
         ep = episode.Episode(self.media)
         ep.series_name = 'Revenge'
         ep.season_number = 4
         ep.episode_numbers = [12]
         ep.episode_names = ['Madness']
         with mock.patch.object(episode.renamer, 'execute') as mock_renamer:
-            ep.rename()
+            ep._rename_local()
             mock_renamer.assert_called_with(
                 self.media,
                 os.path.join(self.dirname, 'Revenge - 04x12 - Madness.mp4'))
 
-    def test_relocate(self):
+    def test_rename_remote(self):
         ep = episode.Episode(self.media)
         ep.series_name = 'Revenge'
         ep.season_number = 4
@@ -148,20 +148,20 @@ class EpisodeTest(base.BaseTest):
         with mock.patch.object(episode.renamer, 'execute') as mock_renamer:
             with mock.patch.object(episode.tools, 'find_library',
                                    return_value='/tmp'):
-                ep.relocate()
+                ep._rename_remote()
                 mock_renamer.assert_called_with(
                     self.media,
                     os.path.join('/tmp', '.', 'Revenge - 04x12 - Madness.mp4'))
 
-    def test_execute_rename(self):
+    def test_rename(self):
         ep = episode.Episode(self.media)
 
         self.CONF.set_override('move_files_enabled', False)
-        with mock.patch.object(ep, 'rename') as mock_rename:
-            ep.execute_rename()
+        with mock.patch.object(ep, '_rename_local') as mock_rename:
+            ep.rename()
             mock_rename.assert_called_with()
 
         self.CONF.set_override('move_files_enabled', True)
-        with mock.patch.object(ep, 'relocate') as mock_relocate:
-            ep.execute_rename()
+        with mock.patch.object(ep, '_rename_remote') as mock_relocate:
+            ep.rename()
             mock_relocate.assert_called_with()

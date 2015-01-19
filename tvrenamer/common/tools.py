@@ -1,4 +1,5 @@
 import copy
+import functools
 import itertools
 import logging
 import os
@@ -172,7 +173,7 @@ def retrieve_files(locations):
         if not location.startswith('\\'):
             location = os.path.abspath(os.path.expanduser(location))
 
-        LOG.info('searching [%s]', location)
+        LOG.debug('searching [%s]', location)
         for root, dirs, files in os.walk(location):
             LOG.debug('found file(s) %s', files)
             all_files.extend([os.path.join(root, name) for name in files])
@@ -202,3 +203,26 @@ def find_library(series_path, locations, default_location):
             segments = segments[:-1]
 
     return default_location
+
+
+def state(method=None, pre=None, post=None, attr='state'):
+    """State decorator"""
+
+    # if called without method, it means we have been called with
+    # optional arguments, we return a decorator with optional arguments
+    # filled in. Next time around we'll be decorating
+    if method is None:
+        return functools.partial(state, pre=pre, post=post, attr=attr)
+
+    # functools makes sure that we don't lose the method details
+    # like method name or doc.
+    @functools.wraps(method)
+    def inner(self, *args, **kwargs):
+        """Inner wrapper for apply pre/post states"""
+        if pre is not None:
+            setattr(self, attr, pre)
+        result = method(self, *args, **kwargs)
+        if post is not None:
+            setattr(self, attr, post)
+        return result
+    return inner
