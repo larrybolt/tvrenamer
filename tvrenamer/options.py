@@ -138,6 +138,7 @@ def list_opts():
     config files.
     The purpose of this is to allow tools like the Oslo sample config file
     generator to discover the options exposed to users by this library.
+
     :returns: a list of (group_name, opts) tuples
     """
     from tvrenamer.common import tools

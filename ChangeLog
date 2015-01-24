@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* added tests for cli, episode, and manager
+* added parallel processing and lockfile functionality
+* updated ChangeLog
+
 0.1a
 ----
 

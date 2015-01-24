@@ -25,6 +25,11 @@ class Manager(object):
         self.tasks = []
 
     def empty(self):
+        """Checks if there are any tasks pending.
+
+        :returns: True if no tasks else False
+        :rtype: bool
+        """
         return not self.tasks
 
     def add_tasks(self, tasks):
@@ -69,7 +74,11 @@ def _get_work(locations, processed):
 
 
 def start():
-    """Entry point to start the processing."""
+    """Entry point to start the processing.
+
+    :returns: results from processing each file found
+    :rtype: dict
+    """
 
     mgr = Manager()
     locations = cfg.CONF.locations

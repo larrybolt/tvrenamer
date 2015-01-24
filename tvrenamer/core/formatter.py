@@ -197,6 +197,16 @@ def _make_valid_filename(value):
 def format_filename(series_name, season_number,
                     episode_numbers, episode_names,
                     extension):
+    """Generates a filename based on metadata using configured format.
+
+    :param str series_name: name of TV series
+    :param int season_number: the numeric season of series
+    :param list(int) episode_numbers: the numeric episode of the series
+    :param list(str) episode_names: episode title of the series
+    :param str extension: media file extension
+    :returns: formatted filename using input values and configured format
+    :rtype: str
+    """
 
     epdata = {
         'seriesname': series_name,
@@ -214,6 +224,13 @@ def format_filename(series_name, season_number,
 
 
 def format_dirname(series_name, season_number):
+    """Generates a directory name based on metadata using configured format.
+
+    :param str series_name: name of TV series
+    :param int season_number: the numeric season of series
+    :returns: formatted directory name using input values and configured format
+    :rtype: str
+    """
 
     data = {
         'seriesname': _make_valid_filename(series_name),

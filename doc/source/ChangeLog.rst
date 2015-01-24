@@ -1,3 +1,25 @@
 CHANGES
 =======
 
+* added tests for cli, episode, and manager
+* added parallel processing and lockfile functionality
+* updated ChangeLog
+
+0.1a
+----
+
+* added initial AUTHORS and ChangeLog files
+* completed test cases for api, made loading data services done via plugin
+* finished tests for service, added tests for cli, and minor cleanup
+* added test cases for episode, and started test cases for service
+* cleaned up renamer and tests, fixed pep8, and added tests for options
+* added testing for core modules
+* added oslo_config.fixture to base test class
+* Fixed name of test class from cut and paste
+* minor pep8 fix
+* Added test cases and documentation
+* added test cases for tools
+* added some test cases and minor changes/fixes and pep8 clean up
+* centralized dependency on oslotest; removed passing logging instance
+* moved the core modules into core package, simplified cli such that it could be used as library, added capture of stack trace of errors, and added some testing code
+* initial commit

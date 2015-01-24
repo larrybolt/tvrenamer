@@ -37,8 +37,12 @@ cfg.CONF.import_opt('valid_extensions', 'tvrenamer.options')
 
 
 class Episode(object):
+    """Represents a TV episode."""
 
     def __init__(self, epfile):
+        """
+        :param str epfile: absolute path and filename of media file
+        """
 
         self.original = epfile
         self.name = os.path.basename(epfile)
@@ -97,12 +101,26 @@ class Episode(object):
 
     @property
     def valid(self):
+        """Provides flag to indicate a valid file.
+
+        :returns: True if all validations passed else False
+        :rtype: bool
+        """
         if self._valid is not None:
             return self._valid
         return self.validate()
 
     @property
     def status(self):
+        """Provides current status of processing episode.
+
+        Structure of status:
+
+            original_filename => formatted_filename, state, result, messages
+
+        :returns: mapping of current processing state
+        :rtype: dict
+        """
         return {
             self.original: {
                 'formatted_filename': self.formatted_filename,
@@ -114,6 +132,11 @@ class Episode(object):
 
     @tools.state(pre=const.PREVALID, post=const.POSTVALID)
     def validate(self):
+        """Performs all validation checks to allow processing to continue.
+
+        :returns: True if all validations passed else False
+        :rtype: bool
+        """
 
         if not os.access(self.original, os.R_OK):
             self._valid = False
@@ -150,6 +173,15 @@ class Episode(object):
 
     @tools.state(pre=const.PREPARSE, post=const.POSTPARSE)
     def parse(self):
+        """Extracts component keys from filename.
+
+        :raises tvrenamer.exceptions.NoValidFilesFoundError:
+            when episode did not pass validations
+        :raises tvrenamer.exceptions.InvalidFilename:
+            when filename was not parseable
+        :raises tvrenamer.exceptions.ConfigValueError:
+            when regex used for parsing was incorrectly configured
+        """
 
         if not self.valid:
             raise exc.NoValidFilesFoundError(';'.join(self.messages))
@@ -187,6 +219,14 @@ class Episode(object):
 
     @tools.state(pre=const.PREENHANCE, post=const.POSTENHANCE)
     def enhance(self):
+        """Load metadata from a data service to improve naming.
+
+        :raises tvrenamer.exceptions.ShowNotFound:
+            when unable to find show/series name based on parsed name
+        :raises tvrenamer.exceptions.EpisodeNotFound:
+            when unable to find episode name(s) based on parsed data
+        """
+
         series, error = self.api.get_series_by_name(self.series_name)
 
         if series is None:
@@ -234,6 +274,14 @@ class Episode(object):
 
     @tools.state(pre=const.PRENAME, post=const.POSTNAME)
     def rename(self):
+        """Renames media file to formatted name.
+
+        After parsing data from initial media filename and searching
+        for additional data to using a data service, a formatted
+        filename will be generated and the media file will be renamed
+        to the generated name and optionally relocated.
+        """
+
         if cfg.CONF.move_files_enabled:
             self._rename_remote()
             LOG.debug('relocated: %s', self)

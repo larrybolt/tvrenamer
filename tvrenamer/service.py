@@ -79,6 +79,7 @@ def _configure(args):
 
 
 def prepare_service(args=None):
+    """Configures application and setups logging."""
     _configure(args)
     _setup_logging()
 

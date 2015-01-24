@@ -12,6 +12,12 @@ cfg.CONF.import_opt('overwrite_file_enabled', 'tvrenamer.options')
 
 
 def execute(filename, formatted_name):
+    """Renames a file based on the name generated using metadata.
+
+    :param str filename: absolute path and filename of original file
+    :param str formatted_name: absolute path and new filename
+    :raises: OSError if unable rename file 
+    """
 
     if os.path.isfile(formatted_name):
         # If the destination exists, raise exception unless force is True
