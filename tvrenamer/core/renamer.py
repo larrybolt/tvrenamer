@@ -16,7 +16,7 @@ def execute(filename, formatted_name):
 
     :param str filename: absolute path and filename of original file
     :param str formatted_name: absolute path and new filename
-    :raises: OSError if unable rename file 
+    :raises: OSError if unable rename file
     """
 
     if os.path.isfile(formatted_name):

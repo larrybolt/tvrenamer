@@ -40,9 +40,7 @@ class Episode(object):
     """Represents a TV episode."""
 
     def __init__(self, epfile):
-        """
-        :param str epfile: absolute path and filename of media file
-        """
+        """:param str epfile: absolute path and filename of media file"""
 
         self.original = epfile
         self.name = os.path.basename(epfile)
@@ -258,20 +256,6 @@ class Episode(object):
             self.series_name, self.season_number)
         return self.formatted_dirname
 
-    def _rename_local(self):
-        renamer.execute(self.original,
-                        os.path.join(self.location,
-                                     self._format_filename()))
-
-    def _rename_remote(self):
-        library_base_path = tools.find_library(self._format_dirname(),
-                                               cfg.CONF.libraries,
-                                               cfg.CONF.default_library)
-        renamer.execute(self.original,
-                        os.path.join(library_base_path,
-                                     self.formatted_dirname,
-                                     self._format_filename()))
-
     @tools.state(pre=const.PRENAME, post=const.POSTNAME)
     def rename(self):
         """Renames media file to formatted name.
@@ -283,8 +267,16 @@ class Episode(object):
         """
 
         if cfg.CONF.move_files_enabled:
-            self._rename_remote()
+            library_base_path = tools.find_library(self._format_dirname(),
+                                                   cfg.CONF.libraries,
+                                                   cfg.CONF.default_library)
+            renamer.execute(self.original,
+                            os.path.join(library_base_path,
+                                         self.formatted_dirname,
+                                         self._format_filename()))
             LOG.debug('relocated: %s', self)
         else:
-            self._rename_local()
+            renamer.execute(self.original,
+                            os.path.join(self.location,
+                                         self._format_filename()))
             LOG.debug('renamed: %s', self)
