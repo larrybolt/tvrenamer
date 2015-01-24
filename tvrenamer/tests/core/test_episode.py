@@ -33,6 +33,29 @@ class EpisodeTest(base.BaseTest):
         self.assertEqual(str(ep), ep_str)
         self.assertEqual(repr(ep), ep_str)
 
+    def test_call(self):
+        ep = episode.Episode(self.media)
+        with mock.patch.object(ep, 'parse'):
+            with mock.patch.object(ep, 'enhance'):
+                with mock.patch.object(ep, 'rename'):
+                    ep()
+                    self.assertEqual(ep.state, episode.const.DONE)
+
+        ep = episode.Episode(self.media)
+        with mock.patch.object(ep, 'parse', side_effect=OSError):
+            ep()
+            self.assertEqual(ep.state, episode.const.FAILED)
+
+        ep = episode.Episode(self.media)
+        with mock.patch.object(ep, 'parse',
+                               side_effect=exc.NoValidFilesFoundError):
+            ep()
+            self.assertEqual(ep.state, episode.const.FAILED)
+
+    def test_status(self):
+        ep = episode.Episode(self.media)
+        self.assertTrue(self.media in ep.status)
+
     def test_validate(self):
         ep = episode.Episode(self.media)
         self.assertTrue(ep.valid)
