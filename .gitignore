@@ -18,6 +18,7 @@ sdist/
 var/
 *.egg-info/
 *.egg
+.eggs/
 .installed.cfg
 
 # Installer logs
@@ -57,3 +58,6 @@ doc/source/sourcecode
 
 # Vagrant
 .vagrant
+
+# virtualenv
+.venv

@@ -14,7 +14,8 @@ logging.getLogger().addHandler(logging.NullHandler())
 
 DEFAULT_LIBRARY_LOG_LEVEL = {'stevedore': logging.WARNING,
                              'requests': logging.WARNING,
-                             'tvdb_api': logging.WARNING
+                             'tvdb_api': logging.WARNING,
+                             'tvrage_api': logging.WARNING,
                              }
 CONSOLE_MESSAGE_FORMAT = '%(message)s'
 LOG_FILE_MESSAGE_FORMAT = '[%(asctime)s] %(levelname)-8s %(name)s %(message)s'

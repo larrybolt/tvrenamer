@@ -1,24 +1,21 @@
 from __future__ import print_function
 
 import testtools
-import tvdb_api
+import tvrage_api
 
-from tvrenamer.services import tvdb
+from tvrenamer.services import tvrage
 from tvrenamer.tests import base
 
 
 def is_unavailable():
     try:
-        api = tvdb_api.Tvdb()
-        api[80379]
+        tvrage_api.search_show(sid='2930')
         print('search successful')
-    except tvdb_api.tvdb_error as dberr:
+    except tvrage_api.TvrageServiceUnavailable:
         # if connection or timeout happens then consider
         # the service unavailable and we will skip tests
-        if 'timed' in str(dberr) or 'connect' in str(dberr):
-            print('service unavailable')
-            return True
-        print('other tvdb exception;', type(dberr), str(dberr))
+        print('service unavailable')
+        return True
     except Exception as err:
         print('other exception;', type(err), str(err))
         pass
@@ -29,13 +26,13 @@ def is_unavailable():
 SERVICE_UNAVAILABLE = is_unavailable()
 
 
-class TvdbServiceTest(base.BaseTest):
+class TvrageServiceTest(base.BaseTest):
 
     def setUp(self):
-        super(TvdbServiceTest, self).setUp()
-        self.api = tvdb.TvdbService()
+        super(TvrageServiceTest, self).setUp()
+        self.api = tvrage.TvrageService()
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_series_by_name(self):
         series, err = self.api.get_series_by_name('The Big Bang Theory')
         self.assertIsNotNone(series)
@@ -45,11 +42,11 @@ class TvdbServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_name('Fake - Unknown Series')
         self.assertIsNone(series)
         self.assertIsNotNone(err)
-        self.assertIsInstance(err, tvdb_api.tvdb_shownotfound)
+        self.assertIsInstance(err, tvrage_api.TvrageShowNotFound)
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_series_by_id(self):
-        series, err = self.api.get_series_by_id(80379)
+        series, err = self.api.get_series_by_id(8511)
         self.assertIsNotNone(series)
         self.assertIsNone(err)
         self.assertEqual(series['seriesname'], 'The Big Bang Theory')
@@ -57,9 +54,9 @@ class TvdbServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_id(0)
         self.assertIsNone(series)
         self.assertIsNotNone(err)
-        self.assertIsInstance(err, tvdb_api.tvdb_error)
+        self.assertIsInstance(err, tvrage_api.TvrageShowNotFound)
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_series_name(self):
         series, err = self.api.get_series_by_name('The Big Bang Theory')
         self.assertIsNotNone(series)
@@ -76,7 +73,7 @@ class TvdbServiceTest(base.BaseTest):
         self.assertIsNone(err)
         self.assertEqual(self.api.get_series_name(series), 'reign')
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name(self):
         series, err = self.api.get_series_by_name('The Big Bang Theory')
         episodes, eperr = self.api.get_episode_name(series, [1], 1)
@@ -93,34 +90,34 @@ class TvdbServiceTest(base.BaseTest):
         self.assertIsNone(eperr)
         self.assertEqual(episodes, ['Pilot'])
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name_season_nf(self):
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [1], 2)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertIsInstance(eperr, tvdb_api.tvdb_seasonnotfound)
+        self.assertIsInstance(eperr, tvrage_api.TvrageSeasonNotFound)
 
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [1], '1')
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertIsInstance(eperr, tvdb_api.tvdb_seasonnotfound)
+        self.assertIsInstance(eperr, tvrage_api.TvrageSeasonNotFound)
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name_attr_nf(self):
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [1], 'xx')
         self.assertIsNone(episodes)
         self.assertIsNone(eperr)
 
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVDB service unavailable')
+    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name_episode_nf(self):
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [25], 1)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertIsInstance(eperr, tvdb_api.tvdb_episodenotfound)
+        self.assertIsInstance(eperr, tvrage_api.TvrageEpisodeNotFound)
 
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [15], 1)
