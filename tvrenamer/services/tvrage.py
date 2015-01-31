@@ -11,6 +11,13 @@ cfg.CONF.import_opt('language', 'tvrenamer.options')
 cfg.CONF.import_opt('output_series_replacements', 'tvrenamer.options')
 
 
+def as_int(val):
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return -1
+
+
 class TvrageService(base.Service):
 
     def get_series_by_name(self, series_name):
@@ -75,7 +82,7 @@ class TvrageService(base.Service):
         epnames = []
         for epno in episode_numbers:
             try:
-                episode = series.episode(season_no, epno)
+                episode = series.episode(as_int(season_no), as_int(epno))
                 epnames.append(episode.name)
             except tvrage_api.TvrageException as err:
                 LOG.exception('episode lookup failed')

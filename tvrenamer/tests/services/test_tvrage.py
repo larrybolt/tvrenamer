@@ -37,9 +37,9 @@ class TvrageServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_name('The Big Bang Theory')
         self.assertIsNotNone(series)
         self.assertIsNone(err)
-        self.assertEqual(series['seriesname'], 'The Big Bang Theory')
+        self.assertEqual(series['name'], 'The Big Bang Theory')
 
-        series, err = self.api.get_series_by_name('Fake - Unknown Series')
+        series, err = self.api.get_series_by_name('xxxKzyniuk')
         self.assertIsNone(series)
         self.assertIsNotNone(err)
         self.assertIsInstance(err, tvrage_api.TvrageShowNotFound)
@@ -49,9 +49,9 @@ class TvrageServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_id(8511)
         self.assertIsNotNone(series)
         self.assertIsNone(err)
-        self.assertEqual(series['seriesname'], 'The Big Bang Theory')
+        self.assertEqual(series['name'], 'The Big Bang Theory')
 
-        series, err = self.api.get_series_by_id(0)
+        series, err = self.api.get_series_by_id(-1)
         self.assertIsNone(series)
         self.assertIsNotNone(err)
         self.assertIsInstance(err, tvrage_api.TvrageShowNotFound)
@@ -71,7 +71,7 @@ class TvrageServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_name('reign (2013)')
         self.assertIsNotNone(series)
         self.assertIsNone(err)
-        self.assertEqual(self.api.get_series_name(series), 'reign')
+        self.assertEqual(self.api.get_series_name(series), 'Reign')
 
     @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name(self):
@@ -99,17 +99,10 @@ class TvrageServiceTest(base.BaseTest):
         self.assertIsInstance(eperr, tvrage_api.TvrageSeasonNotFound)
 
         series, err = self.api.get_series_by_name('Firefly')
-        episodes, eperr = self.api.get_episode_name(series, [1], '1')
+        episodes, eperr = self.api.get_episode_name(series, [1], 'xx')
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
         self.assertIsInstance(eperr, tvrage_api.TvrageSeasonNotFound)
-
-    @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
-    def test_get_episode_name_attr_nf(self):
-        series, err = self.api.get_series_by_name('Firefly')
-        episodes, eperr = self.api.get_episode_name(series, [1], 'xx')
-        self.assertIsNone(episodes)
-        self.assertIsNone(eperr)
 
     @testtools.skipIf(SERVICE_UNAVAILABLE, 'TVRage service unavailable')
     def test_get_episode_name_episode_nf(self):
@@ -120,7 +113,7 @@ class TvrageServiceTest(base.BaseTest):
         self.assertIsInstance(eperr, tvrage_api.TvrageEpisodeNotFound)
 
         series, err = self.api.get_series_by_name('Firefly')
-        episodes, eperr = self.api.get_episode_name(series, [15], 1)
+        episodes, eperr = self.api.get_episode_name(series, [1], 1)
         self.assertIsNotNone(episodes)
         self.assertIsNone(eperr)
-        self.assertEqual(episodes, ['Serenity'])
+        self.assertEqual(episodes, ['The Train Job'])

@@ -17,4 +17,5 @@ sphinxcontrib-httpdomain
 wheel
 
 # testing
+nose
 oslotest

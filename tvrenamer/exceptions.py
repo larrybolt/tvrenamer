@@ -7,7 +7,7 @@ class BaseTvRenamerException(Exception):
 
 
 class NoValidFilesFoundError(BaseTvRenamerException):
-    """Raised when no valid files are found. Effectively exits tvnamer."""
+    """Raised when no valid files are found. Effectively exits tvrenamer."""
     pass
 
 
@@ -29,7 +29,7 @@ class ConfigValueError(BaseConfigError):
 class DataRetrievalError(BaseTvRenamerException):
     """Raised when unable to retrieve data.
 
-    An error (such as a network problem) prevents tvnamer
+    An error (such as a network problem) prevents tvrenamer
     from being able to retrieve data such as episode name
     """
 
