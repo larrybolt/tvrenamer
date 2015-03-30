@@ -4,3 +4,5 @@ oslo.config>=1.4.0
 pbr>=0.10.0
 six>=1.8.0
 stevedore>=1.1.0
+sqlalchemy==0.9.8
+

@@ -93,9 +93,7 @@ class Episode(object):
                 self.messages.append(str(err))
             self.state = const.FAILED
 
-        # just return the final result no matter where processing
-        # has ended.
-        return self.status
+        return self
 
     @property
     def valid(self):
