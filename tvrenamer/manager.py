@@ -4,13 +4,16 @@ import time
 
 import concurrent.futures as conc_futures
 from oslo.config import cfg
+import six
 
+from tvrenamer import cache
 from tvrenamer.common import tools
 from tvrenamer.core import episode
 
 LOG = logging.getLogger(__name__)
 
 cfg.CONF.import_opt('max_processes', 'tvrenamer.options')
+cfg.CONF.import_opt('enabled', 'tvrenamer.cache', 'database')
 
 
 class Manager(object):
@@ -55,9 +58,9 @@ class Manager(object):
         # the tasks.
         del self.tasks[:]
 
-        results = {}
+        results = []
         for future in conc_futures.as_completed(futures_task):
-            results.update(future.result())
+            results.append(future.result())
         return results
 
     def shutdown(self):
@@ -73,6 +76,46 @@ def _get_work(locations, processed):
     return episodes
 
 
+def _handle_results(results):
+
+    if cfg.CONF.database.enabled:
+        for res in results:
+            cache.dbapi().save(cache.MediaFile(
+                original=res.original,
+                name=res.name,
+                extension=res.extension,
+                location=res.location,
+                clean_name=res.clean_name,
+                series_name=res.series_name,
+                season_number=res.season_number,
+                episode_numbers=','.join(
+                    str(e) for e in res.episode_numbers or []),
+                episode_names=','.join(res.episode_names or []),
+                formatted_filename=res.formatted_filename,
+                formatted_dirname=res.formatted_dirname,
+                state=res.state,
+                messages='\n'.join(res.messages)
+                ))
+
+    output = {}
+    for r in results:
+        output.update(r.status)
+
+    # if logging is not enabled then no need to
+    # go any further.
+    if LOG.isEnabledFor(logging.INFO):
+
+        for epname, result in six.iteritems(output):
+            status = 'SUCCESS' if result.get('result') else 'FAILURE'
+            LOG.info('[%s]: %s --> %s', status, epname,
+                     result.get('formatted_filename'))
+            LOG.info('\tPROGRESS: %s', result.get('progress'))
+            if result.get('messages'):
+                LOG.info('\tREASON: %s', result.get('messages'))
+
+    return output
+
+
 def start():
     """Entry point to start the processing.
 
@@ -81,7 +124,7 @@ def start():
     """
 
     mgr = Manager()
-    locations = cfg.CONF.locations
+    locations = cfg.CONF.locations or []
     results = {}
 
     LOG.info('tvrenamer daemon starting up...')
@@ -96,7 +139,7 @@ def start():
                 continue
 
             # process the work
-            results.update(mgr.run())
+            results.update(_handle_results(mgr.run()))
 
     except KeyboardInterrupt:
         # we were asked to stop from command line so simply stop
@@ -104,5 +147,3 @@ def start():
     finally:
         LOG.info('tvrenamer daemon shutting down...')
         mgr.shutdown()
-
-    return results

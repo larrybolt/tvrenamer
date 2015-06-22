@@ -40,6 +40,45 @@ class ManagerTests(base.BaseTest):
 
 class ManagerProcessTests(base.BaseTest):
 
+    def _make_data(self):
+        results = []
+        ep1 = mock.Mock()
+        ep1.status = {
+            '/tmp/Lucy.2014.576p.BDRip.AC3.x264.DuaL-EAGLE.mkv': {
+                'formatted_filename': None,
+                'result': False,
+                'messages': 'Could not find season 20'}
+            }
+        results.append(ep1)
+
+        ep2 = mock.Mock()
+        ep2.status = {
+            '/tmp/revenge.412.hdtv-lol.mp4': {
+                'formatted_filename': 'S04E12-Madness.mp4',
+                'result': True,
+                'messages': None}
+            }
+        results.append(ep2)
+        return results
+
+    def test_handle_results(self):
+
+        self.CONF.set_override('enabled', False, 'database')
+
+        with mock.patch.object(manager.LOG, 'isEnabledFor',
+                               return_value=False):
+            manager._handle_results([])
+
+        with mock.patch.object(manager.LOG, 'isEnabledFor',
+                               return_value=True):
+            with mock.patch.object(manager.LOG, 'info') as mock_log_info:
+                manager._handle_results([])
+                self.assertEqual(mock_log_info.call_count, 0)
+
+            with mock.patch.object(manager.LOG, 'info') as mock_log_info:
+                manager._handle_results(self._make_data())
+                self.assertEqual(mock_log_info.call_count, 5)
+
     def test_get_work(self):
 
         locations = ['/tmp/download', '/downloads']
