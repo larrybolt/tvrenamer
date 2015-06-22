@@ -15,7 +15,7 @@ def _get_episode_by_boundary(match):
     if start > end:
         # Swap start and end
         start, end = end, start
-    return range(start, end + 1)
+    return list(range(start, end + 1))
 
 
 def _get_episodes(match, namedgroups):

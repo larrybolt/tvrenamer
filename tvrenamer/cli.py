@@ -7,11 +7,10 @@ import tempfile
 import lockfile
 import six
 
-import tvrenamer
 from tvrenamer import manager
 from tvrenamer import service
 
-LOG = logging.getLogger(tvrenamer.PROJECT_NAME)
+LOG = logging.getLogger(__package__)
 
 
 def _show_results(results):
@@ -30,8 +29,7 @@ def _show_results(results):
             LOG.info('\tREASON: %s', result.get('messages'))
 
 
-@lockfile.locked(os.path.join(tempfile.gettempdir(), tvrenamer.PROJECT_NAME),
-                 timeout=10)
+@lockfile.locked(os.path.join(tempfile.gettempdir(), __package__), timeout=10)
 def main():
     service.prepare_service()
     _show_results(manager.start())

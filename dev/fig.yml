@@ -1,0 +1,8 @@
+docs:
+  image: nginx
+  ports:
+   - "80:80"
+  volumes:
+   - ./tvrenamer/doc/build/html:/usr/share/nginx/html/docs:ro
+   - ./tvrenamer/cover:/usr/share/nginx/html/cover:ro
+

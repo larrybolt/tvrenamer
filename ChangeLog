@@ -1,6 +1,13 @@
-CHANGES
-=======
+Changelog
+=========
 
+* Completed testing for service tvrage. Switched to nose for testing so that coverage can be printed to stdout for parsing
+* updated version of tvrage_api
+* update repo url
+* update version of tvrage_api
+* added tvrage service as an option; add handling for service unavailable during testing
+* removed extra functions for renaming within Episode
+* updated documentation
 * added tests for cli, episode, and manager
 * added parallel processing and lockfile functionality
 * updated ChangeLog

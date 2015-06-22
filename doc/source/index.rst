@@ -1,18 +1,26 @@
-Contents
-========
+Tvrenamer
+=========
+
+Automatic TV Episode Renamer
+
+Features
+--------
+
+* rename tv episodes
+
+
+Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     ChangeLog
-    ToDo
-    sourcecode/autoindex
+    source
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 

@@ -4,9 +4,9 @@ import re
 
 from oslo.config import cfg
 import six
+import titlecase as tc
 
 from tvrenamer.common import encodeutils
-from tvrenamer.common import titlecase  # noqa
 from tvrenamer.common import tools
 
 cfg.CONF.import_opt('input_series_replacements', 'tvrenamer.options')
@@ -19,6 +19,8 @@ cfg.CONF.import_opt('multiep_format', 'tvrenamer.options')
 cfg.CONF.import_opt('filename_character_blacklist', 'tvrenamer.options')
 cfg.CONF.import_opt('replacement_character', 'tvrenamer.options')
 cfg.CONF.import_opt('output_filename_replacements', 'tvrenamer.options')
+
+tc.ALL_CAPS = re.compile(r'^[A-Z\s%s]+$' % tc.PUNCT)
 
 
 def _replace_input_series_name(seriesname):
@@ -173,6 +175,8 @@ def _make_valid_filename(value):
 
     # Replace accented characters with ASCII equivalent
     value = encodeutils.safe_encode(value, encoding='ascii', errors='ignore')
+    extension = encodeutils.safe_encode(extension, encoding='ascii',
+                                        errors='ignore')
 
     # Truncate filenames to valid/sane length.
     # NTFS is limited to 255 characters, HFS+ and EXT3 don't seem to have
@@ -191,7 +195,7 @@ def _make_valid_filename(value):
             new_length = max_len - len(extension)
             value = value[:new_length]
 
-    return value + extension
+    return encodeutils.safe_decode(value + extension, incoming='ascii')
 
 
 def format_filename(series_name, season_number,
@@ -217,7 +221,7 @@ def format_filename(series_name, season_number,
         }
 
     value = tools.apply_replacements(
-        titlecase(cfg.CONF.filename_format_ep % epdata),
+        tc.titlecase(cfg.CONF.filename_format_ep % epdata),
         cfg.CONF.output_filename_replacements)
 
     return _make_valid_filename(value)
@@ -237,4 +241,4 @@ def format_dirname(series_name, season_number):
         'seasonnumber': season_number,
         }
 
-    return titlecase(cfg.CONF.directory_name_format % data)
+    return tc.titlecase(cfg.CONF.directory_name_format % data)

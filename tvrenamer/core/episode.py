@@ -73,8 +73,9 @@ class Episode(object):
                                              self.extension,
                                              self.series_name or '',
                                              self.season_number or '',
-                                             zip(self.episode_numbers or [],
-                                                 self.episode_names or []),
+                                             list(zip(
+                                                 self.episode_numbers or [],
+                                                 self.episode_names or [])),
                                              self.formatted_dirname or '',
                                              self.formatted_filename or ''))
 

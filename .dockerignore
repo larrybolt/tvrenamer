@@ -11,6 +11,7 @@ build/
 develop-eggs/
 dist/
 eggs/
+.eggs/
 lib/
 lib64/
 parts/
@@ -18,7 +19,6 @@ sdist/
 var/
 *.egg-info/
 *.egg
-.eggs/
 .installed.cfg
 
 # Installer logs
@@ -57,6 +57,8 @@ doc/build/
 
 # Vagrant
 .vagrant
+Vagrantfile
+dev/
 
 # virtualenv
 venv/
