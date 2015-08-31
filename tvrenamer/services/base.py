@@ -27,23 +27,24 @@ class Service(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_series_name(self, series):
+    def get_series_name(self, series, replacements):
         """Perform lookup for name of series
 
         :param object series: instance of a series
+        :param dict replacments: map of series name replacements
         :returns: name of series
         :rtype: str
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_episode_name(self, series, episode_numbers, season_number=None):
+    def get_episode_name(self, series, episode_numbers, season_number):
         """Perform lookup for name of episode numbers for a given series.
 
         :param object series: instance of a series
         :param list episode_numbers: the episode sequence number
-        :param int season_number: numeric season of series (default: None)
-        :returns: name of episode
-        :rtype: str
+        :param int season_number: numeric season of series
+        :returns: list of episode name
+        :rtype: list(str)
         """
         raise NotImplementedError

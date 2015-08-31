@@ -13,9 +13,6 @@
 # serve to show the default.
 import os
 
-# This is required for ReadTheDocs.org, but isn't a bad idea anyway.
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tvrenamer.settings'
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -29,6 +26,8 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
+    'oslo_config.sphinxext',
+    'stevedore.sphinxext',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

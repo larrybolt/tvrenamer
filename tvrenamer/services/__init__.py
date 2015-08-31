@@ -1,4 +1,4 @@
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import driver
 
 cfg.CONF.import_opt('lookup_service', 'tvrenamer.options')

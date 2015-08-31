@@ -4,7 +4,7 @@ import os
 import tempfile
 
 import fixtures
-from oslo.config import cfg
+from oslo_config import cfg
 from testtools import matchers
 
 from tvrenamer import service

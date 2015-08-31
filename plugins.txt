@@ -1,4 +1,0 @@
-# leverage tvdb data service
-tvdb_api>=1.9
-# leverage tvrage data service
-git+http://gitlab.local/shad7/tvrage_api.git@0.1.2#egg=tvrage_api

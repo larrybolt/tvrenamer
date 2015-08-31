@@ -1,21 +1,30 @@
 import logging
+import os
 
-from oslo.config import cfg
-import tvdb_api
+from oslo_config import cfg
+import tvdbapi_client
+from tvdbapi_client import exceptions
 
 from tvrenamer.services import base
 
 LOG = logging.getLogger(__name__)
 
-cfg.CONF.import_opt('language', 'tvrenamer.options')
-cfg.CONF.import_opt('output_series_replacements', 'tvrenamer.options')
-
 
 class TvdbService(base.Service):
+    """Provides access thetvdb data service to lookup TV Series information."""
 
     def __init__(self):
         super(TvdbService, self).__init__()
-        self.api = tvdb_api.Tvdb(language=cfg.CONF.language)
+        api_cfgs = cfg.CONF.find_file('tvdbapi.conf')
+        if api_cfgs:
+            self.api = tvdbapi_client.get_client(
+                config_file=api_cfgs)
+        else:
+            self.api = tvdbapi_client.get_client(
+                apikey=os.environ.get('TVDB_API_KEY'),
+                username=os.environ.get('TVDB_USERNAME'),
+                userpass=os.environ.get('TVDB_PASSWORD'),
+                select_first=True)
 
     def get_series_by_name(self, series_name):
         """Perform lookup for series
@@ -24,7 +33,11 @@ class TvdbService(base.Service):
         :returns: instance of series
         :rtype: object
         """
-        return self._get_series(series_name)
+        try:
+            return self.api.search_series(name=series_name), None
+        except exceptions.TVDBRequestException as err:
+            LOG.exception('search for series %s failed', series_name)
+            return None, err
 
     def get_series_by_id(self, series_id):
         """Perform lookup for series
@@ -33,90 +46,63 @@ class TvdbService(base.Service):
         :returns: instance of series
         :rtype: object
         """
-        return self._get_series(series_id)
-
-    def _get_series(self, key):
         try:
-            return self.api[key], None
-        except tvdb_api.tvdb_error as err:
-            LOG.error('Error with thetvdb: %s', err)
+            return self.api.get_series(series_id), None
+        except exceptions.TVDBRequestException as err:
+            LOG.exception('search for series %s failed', series_id)
             return None, err
-        except tvdb_api.tvdb_shownotfound as nferr:
-            LOG.error('Show %s not found on thetvdb: %s', key, nferr)
-            return None, nferr
-        except tvdb_api.tvdb_userabort as uaerr:
-            LOG.error('user abort: %s', uaerr)
-            return None, uaerr
 
-    def get_series_name(self, series):
+    def get_series_name(self, series, replacements):
         """Perform lookup for name of series
 
         :param object series: instance of a series
+        :param dict replacments: map of series name replacements
         :returns: name of series
         :rtype: str
         """
-        if series is None:
-            return None
-        series_name = series['seriesname']
-        substitute_name = cfg.CONF.output_series_replacements
-        if substitute_name:
-            return substitute_name.get(series_name.lower(), series_name)
+        series_name = series.get('seriesName')
+        if replacements:
+            return replacements.get(series_name.lower(), series_name)
         return series_name
 
-    def get_episode_name(self, series, episode_numbers, season_number=None):
+    def _get_epname(self, episodes, epno, absolute=False):
+
+        epname = None
+        for ep in episodes:
+            if int(ep.get('airedEpisodeNumber', -1)) == int(epno):
+                epname = ep.get('episodeName')
+                break
+            if absolute and int(ep.get('absoluteNumber', -1)) == int(epno):
+                epname = ep.get('episodeName')
+                break
+
+        return epname
+
+    def get_episode_name(self, series, episode_numbers, season_number):
         """Perform lookup for name of episode numbers for a given series.
 
         :param object series: instance of a series
         :param list episode_numbers: the episode sequence number
-        :param int season_number: numeric season of series (default: None)
-        :returns: name of episode
+        :param int season_number: numeric season of series
+        :returns: list of episode name
         :rtype: list(str)
         """
-        if series is None:
-            LOG.warning('no series provided when requesting episode name')
-            return None, None
-
-        if season_number is None:
-            LOG.debug('no season number, defaulting to 1')
-            season_no = 1
-        else:
-            season_no = season_number
+        try:
+            episodes = self.api.get_episodes(series.get('id'),
+                                             airedSeason=season_number)
+        except exceptions.TVDBRequestException as err:
+            LOG.exception('episodes for series %s season no %s failed',
+                          series.get('id'), season_number)
+            return None, err
 
         epnames = []
         for epno in episode_numbers:
-            try:
-                episodeinfo = series[season_no][epno]
-            except tvdb_api.tvdb_seasonnotfound as snferr:
-                LOG.error('Season could not be found: %s', snferr)
-                return None, snferr
-            except tvdb_api.tvdb_episodenotfound as enferr:
-                # Try to search by absolute_number
-                sr = series.search(epno, 'absolute_number')
-                if len(sr) > 1:
-                    # For multiple results try and make sure there is a
-                    # direct match
-                    unsure = True
-                    for e in sr:
-                        if int(e['absolute_number']) == epno:
-                            epnames.append(e['episodename'])
-                            unsure = False
-                    # If unsure error out
-                    if unsure:
-                        LOG.error('No episode actually matches %s, found %s '
-                                  'results instead', epno, len(sr))
-                        return None, None
-                elif len(sr) == 1:
-                    epnames.append(sr[0]['episodename'])
-                else:
-                    LOG.error('Episode of show could not be found (also '
-                              'tried searching by absolute episode number): '
-                              '%s', enferr)
-                    return None, enferr
+            epname = self._get_epname(episodes, epno)
+            if epname is None:
+                epname = self._get_epname(episodes, epno, absolute=True)
+                if epname is None:
+                    return None, None
 
-            except tvdb_api.tvdb_attributenotfound:
-                LOG.error('Could not find episode name for %s', epno)
-                return None, None
-            else:
-                epnames.append(episodeinfo['episodename'])
+            epnames.append(epname)
 
         return epnames, None

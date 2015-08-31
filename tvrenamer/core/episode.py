@@ -16,7 +16,7 @@ via the provided configuration.
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from tvrenamer.common import tools
 from tvrenamer import constants as const
@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 cfg.CONF.import_opt('filename_blacklist', 'tvrenamer.options')
 cfg.CONF.import_opt('input_filename_replacements', 'tvrenamer.options')
+cfg.CONF.import_opt('output_series_replacements', 'tvrenamer.options')
 cfg.CONF.import_opt('default_library', 'tvrenamer.options')
 cfg.CONF.import_opt('libraries', 'tvrenamer.options')
 cfg.CONF.import_opt('move_files_enabled', 'tvrenamer.options')
@@ -231,7 +232,8 @@ class Episode(object):
             LOG.info(self.messages[-1])
             raise exc.ShowNotFound(str(error))
 
-        self.series_name = self.api.get_series_name(series)
+        self.series_name = self.api.get_series_name(
+            series, cfg.CONF.output_series_replacements)
         self.episode_names, error = self.api.get_episode_name(
             series, self.episode_numbers, self.season_number)
 

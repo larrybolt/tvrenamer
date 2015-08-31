@@ -2,7 +2,7 @@ import os
 import platform
 import re
 
-from oslo.config import cfg
+from oslo_config import cfg
 import six
 import titlecase as tc
 

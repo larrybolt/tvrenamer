@@ -1,25 +1,18 @@
-Tvrenamer
-=========
-
-Automatic TV Episode Renamer
-
-Features
---------
-
-* rename tv episodes
-
+.. include:: ../../README.rst
 
 Contents:
 
 .. toctree::
     :maxdepth: 1
 
+    services
+    options
+    api/modules
     ChangeLog
-    source
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`search`
