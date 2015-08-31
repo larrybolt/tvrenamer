@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.1.0
+-----
+
+* [RELEASE] Update to version v0.1.0
+* enable working with new project, no tags
+* [TASK] Replace tvdb API library and cleanup
+* added dev tools; added titlecase req
+* added caching of processing results for each media file
 * Completed testing for service tvrage. Switched to nose for testing so that coverage can be printed to stdout for parsing
 * updated version of tvrage_api
 * update repo url
@@ -11,10 +19,6 @@ Changelog
 * added tests for cli, episode, and manager
 * added parallel processing and lockfile functionality
 * updated ChangeLog
-
-0.1a
-----
-
 * added initial AUTHORS and ChangeLog files
 * completed test cases for api, made loading data services done via plugin
 * finished tests for service, added tests for cli, and minor cleanup
