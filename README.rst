@@ -1,6 +1,16 @@
 TVRenamer
 =========
 
+.. image:: https://readthedocs.org/projects/tvrenamer/badge/?version=latest
+    :target: https://readthedocs.org/projects/tvrenamer/?badge=latest
+
+.. image:: https://travis-ci.org/shad7/tvrenamer.svg?branch=develop
+    :target: https://travis-ci.org/shad7/tvrenamer
+
+.. image:: https://coveralls.io/repos/shad7/tvrenamer/badge.svg?branch=develop&service=github
+    :target: https://coveralls.io/github/shad7/tvrenamer?branch=develop
+
+
 Automatic TV Episode Renamer
 
 
