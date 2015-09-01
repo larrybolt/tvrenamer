@@ -10,6 +10,9 @@ TVRenamer
 .. image:: https://coveralls.io/repos/shad7/tvrenamer/badge.svg?branch=develop&service=github
     :target: https://coveralls.io/github/shad7/tvrenamer?branch=develop
 
+.. image:: https://requires.io/github/shad7/tvrenamer/requirements.svg?branch=develop
+    :target: https://requires.io/github/shad7/tvrenamer/requirements/?branch=develop
+
 
 Automatic TV Episode Renamer
 
