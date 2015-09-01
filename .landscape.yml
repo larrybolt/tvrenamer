@@ -9,3 +9,4 @@ requirements:
 ignore-paths:
     - doc
     - setup.py
+    - tvrenamer/common/encodeutils.py
