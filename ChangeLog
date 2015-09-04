@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.1.2
+-----
+
+* [RELEASE] Update to version v0.1.2
+* [TASK] Sets config_dir value
+* [TASK] Add landscape configuration
+* [TASK] Add requires.io badge
+* [TASK] Optimize container image size
+
 0.1.1
 -----
 
