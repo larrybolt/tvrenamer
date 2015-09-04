@@ -10,15 +10,12 @@ COPY . /tvrenamer/
 WORKDIR /tvrenamer
 
 RUN apk add --update git g++ python-dev \
-    && pip install -U -r requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt \
     && python setup.py install \
     && apk del git g++ python-dev \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf .git/ \
-    && rm -rf build/
+    && rm -rf /var/cache/apk/* .git/ build/ *.egg-info/
 
 VOLUME ["/usr/etc/tvrenamer"]
-EXPOSE 5000
 
 CMD ["tvrename"]
 
