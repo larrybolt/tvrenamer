@@ -1,8 +1,6 @@
 from oslo_config import cfg
 from stevedore import driver
 
-cfg.CONF.import_opt('lookup_service', 'tvrenamer.options')
-
 _SERVICE_MANAGER = None
 
 
@@ -15,3 +13,11 @@ def get_service():
                                                 name=cfg.CONF.lookup_service,
                                                 invoke_on_load=True)
     return _SERVICE_MANAGER.driver
+
+
+def load_service_opts(conf):
+    """Load configuration options for services."""
+    try:
+        conf.import_group('tvdb', 'tvdbapi_client.options')
+    except ImportError:
+        pass

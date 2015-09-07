@@ -63,7 +63,7 @@ class ManagerProcessTests(base.BaseTest):
 
     def test_handle_results(self):
 
-        self.CONF.set_override('enabled', False, 'database')
+        self.CONF.set_override('cache_enabled', False)
 
         with mock.patch.object(manager.LOG, 'isEnabledFor',
                                return_value=False):

@@ -7,9 +7,6 @@ from oslo_config import cfg
 
 LOG = logging.getLogger(__name__)
 
-cfg.CONF.import_opt('dryrun', 'tvrenamer.options')
-cfg.CONF.import_opt('overwrite_file_enabled', 'tvrenamer.options')
-
 
 def execute(filename, formatted_name):
     """Renames a file based on the name generated using metadata.

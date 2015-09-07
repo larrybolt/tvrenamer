@@ -14,7 +14,7 @@ class SAApiTestCase(base.BaseTest):
         dbfile = os.path.join(tempfile.mkdtemp(), 'cache.db')
         self.CONF.set_override('connection',
                                'sqlite:///' + dbfile,
-                               'database')
+                               'cache')
         self.dbconn = api.Connection(self.CONF)
 
     def test_upgrade(self):

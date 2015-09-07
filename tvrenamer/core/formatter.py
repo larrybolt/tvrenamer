@@ -9,17 +9,6 @@ import titlecase as tc
 from tvrenamer.common import encodeutils
 from tvrenamer.common import tools
 
-cfg.CONF.import_opt('input_series_replacements', 'tvrenamer.options')
-cfg.CONF.import_opt('directory_name_format', 'tvrenamer.options')
-cfg.CONF.import_opt('filename_format_ep', 'tvrenamer.options')
-cfg.CONF.import_opt('episode_single', 'tvrenamer.options')
-cfg.CONF.import_opt('episode_separator', 'tvrenamer.options')
-cfg.CONF.import_opt('multiep_join_name_with', 'tvrenamer.options')
-cfg.CONF.import_opt('multiep_format', 'tvrenamer.options')
-cfg.CONF.import_opt('filename_character_blacklist', 'tvrenamer.options')
-cfg.CONF.import_opt('replacement_character', 'tvrenamer.options')
-cfg.CONF.import_opt('output_filename_replacements', 'tvrenamer.options')
-
 tc.ALL_CAPS = re.compile(r'^[A-Z\s%s]+$' % tc.PUNCT)
 
 

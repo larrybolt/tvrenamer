@@ -216,7 +216,7 @@ def state(method=None, pre=None, post=None, attr='state'):
 
     # functools makes sure that we don't lose the method details
     # like method name or doc.
-    @functools.wraps(method)
+    @six.wraps(method)
     def inner(self, *args, **kwargs):
         """Inner wrapper for apply pre/post states"""
         if pre is not None:

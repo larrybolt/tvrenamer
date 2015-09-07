@@ -1,8 +1,6 @@
 import logging
-import os
 
-from oslo_config import cfg
-import tvdbapi_client
+from tvdbapi_client import api
 from tvdbapi_client import exceptions
 
 from tvrenamer.services import base
@@ -10,21 +8,22 @@ from tvrenamer.services import base
 LOG = logging.getLogger(__name__)
 
 
+def as_str(error):
+    resp = getattr(error,  'response',  None)
+    if resp is not None:
+        return resp.reason
+    msg = getattr(error, 'strerror', None)
+    if msg is not None:
+        return msg
+    return str(error)
+
+
 class TvdbService(base.Service):
     """Provides access thetvdb data service to lookup TV Series information."""
 
     def __init__(self):
         super(TvdbService, self).__init__()
-        api_cfgs = cfg.CONF.find_file('tvdbapi.conf')
-        if api_cfgs:
-            self.api = tvdbapi_client.get_client(
-                config_file=api_cfgs)
-        else:
-            self.api = tvdbapi_client.get_client(
-                apikey=os.environ.get('TVDB_API_KEY'),
-                username=os.environ.get('TVDB_USERNAME'),
-                userpass=os.environ.get('TVDB_PASSWORD'),
-                select_first=True)
+        self.api = api.TVDBClient()
 
     def get_series_by_name(self, series_name):
         """Perform lookup for series
@@ -37,7 +36,7 @@ class TvdbService(base.Service):
             return self.api.search_series(name=series_name), None
         except exceptions.TVDBRequestException as err:
             LOG.exception('search for series %s failed', series_name)
-            return None, err
+            return None, as_str(err)
 
     def get_series_by_id(self, series_id):
         """Perform lookup for series
@@ -50,7 +49,7 @@ class TvdbService(base.Service):
             return self.api.get_series(series_id), None
         except exceptions.TVDBRequestException as err:
             LOG.exception('search for series %s failed', series_id)
-            return None, err
+            return None, as_str(err)
 
     def get_series_name(self, series, replacements):
         """Perform lookup for name of series
@@ -93,7 +92,7 @@ class TvdbService(base.Service):
         except exceptions.TVDBRequestException as err:
             LOG.exception('episodes for series %s season no %s failed',
                           series.get('id'), season_number)
-            return None, err
+            return None, as_str(err)
 
         epnames = []
         for epno in episode_numbers:

@@ -12,9 +12,6 @@ from tvrenamer.core import episode
 
 LOG = logging.getLogger(__name__)
 
-cfg.CONF.import_opt('max_processes', 'tvrenamer.options')
-cfg.CONF.import_opt('enabled', 'tvrenamer.cache', 'database')
-
 
 class Manager(object):
     """Manages a pool of processes and tasks.
@@ -78,40 +75,41 @@ def _get_work(locations, processed):
 
 def _handle_results(results):
 
-    if cfg.CONF.database.enabled:
-        for res in results:
-            cache.dbapi().save(cache.MediaFile(
-                original=res.original,
-                name=res.name,
-                extension=res.extension,
-                location=res.location,
-                clean_name=res.clean_name,
-                series_name=res.series_name,
-                season_number=res.season_number,
-                episode_numbers=','.join(
-                    str(e) for e in res.episode_numbers or []),
-                episode_names=','.join(res.episode_names or []),
-                formatted_filename=res.formatted_filename,
-                formatted_dirname=res.formatted_dirname,
-                state=res.state,
-                messages='\n'.join(res.messages)
-                ))
-
     output = {}
-    for r in results:
-        output.update(r.status)
+    for res in results:
+        output.update(res.status)
 
-    # if logging is not enabled then no need to
-    # go any further.
-    if LOG.isEnabledFor(logging.INFO):
+        if cfg.CONF.cache_enabled:
+            try:
+                cache.dbapi().save(cache.MediaFile(
+                    original=res.original,
+                    name=res.name,
+                    extension=res.extension,
+                    location=res.location,
+                    clean_name=res.clean_name,
+                    series_name=res.series_name,
+                    season_number=res.season_number,
+                    episode_numbers=','.join(
+                        str(e) for e in res.episode_numbers or []),
+                    episode_names=','.join(res.episode_names or []),
+                    formatted_filename=res.formatted_filename,
+                    formatted_dirname=res.formatted_dirname,
+                    state=res.state,
+                    messages='\n'.join(res.messages)
+                    ))
+            except Exception:
+                LOG.exception('failed to cache result: %s', res.status)
 
-        for epname, result in six.iteritems(output):
-            status = 'SUCCESS' if result.get('result') else 'FAILURE'
-            LOG.info('[%s]: %s --> %s', status, epname,
-                     result.get('formatted_filename'))
-            LOG.info('\tPROGRESS: %s', result.get('progress'))
-            if result.get('messages'):
-                LOG.info('\tREASON: %s', result.get('messages'))
+        # if logging is not enabled then no need to
+        # go any further.
+        if LOG.isEnabledFor(logging.INFO):
+            for epname, data in six.iteritems(res.status):
+                status = 'SUCCESS' if data.get('result') else 'FAILURE'
+                LOG.info('[%s]: %s --> %s', status, epname,
+                         data.get('formatted_filename'))
+                LOG.info('\tPROGRESS: %s', data.get('progress'))
+                if data.get('messages'):
+                    LOG.info('\tREASON: %s', data.get('messages'))
 
     return output
 

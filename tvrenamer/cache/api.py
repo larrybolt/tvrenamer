@@ -18,7 +18,7 @@ class Connection(object):
         """
         self.conf = conf
         self._engine_facade = db_session.EngineFacade.from_config(
-            conf.database.connection, conf)
+            conf.cache.connection, conf)
         self.upgrade()
 
     def upgrade(self):

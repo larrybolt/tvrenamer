@@ -28,14 +28,6 @@ from tvrenamer import services
 
 LOG = logging.getLogger(__name__)
 
-cfg.CONF.import_opt('filename_blacklist', 'tvrenamer.options')
-cfg.CONF.import_opt('input_filename_replacements', 'tvrenamer.options')
-cfg.CONF.import_opt('output_series_replacements', 'tvrenamer.options')
-cfg.CONF.import_opt('default_library', 'tvrenamer.options')
-cfg.CONF.import_opt('libraries', 'tvrenamer.options')
-cfg.CONF.import_opt('move_files_enabled', 'tvrenamer.options')
-cfg.CONF.import_opt('valid_extensions', 'tvrenamer.options')
-
 
 class Episode(object):
     """Represents a TV episode."""
