@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from tvrenamer.cache import api
+from tvrenamer import cache
 from tvrenamer.cache import models as db_model
 from tvrenamer.tests import base
 
@@ -15,7 +15,11 @@ class SAApiTestCase(base.BaseTest):
         self.CONF.set_override('connection',
                                'sqlite:///' + dbfile,
                                'cache')
-        self.dbconn = api.Connection(self.CONF)
+        self.dbconn = cache.dbapi(self.CONF)
+
+    def tearDown(self):
+        cache._DBAPI = None
+        super(SAApiTestCase, self).tearDown()
 
     def test_upgrade(self):
         try:
@@ -25,7 +29,8 @@ class SAApiTestCase(base.BaseTest):
             self.assertTrue(False)
 
     def test_clear(self):
-        self.dbconn.clear()
+        dbapi = cache.dbapi(self.CONF)
+        dbapi.clear()
         self.assertTrue(True)
 
     def test_shrink_db(self):

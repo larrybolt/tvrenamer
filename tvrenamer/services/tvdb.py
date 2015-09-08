@@ -10,12 +10,7 @@ LOG = logging.getLogger(__name__)
 
 def as_str(error):
     resp = getattr(error,  'response',  None)
-    if resp is not None:
-        return resp.reason
-    msg = getattr(error, 'strerror', None)
-    if msg is not None:
-        return msg
-    return str(error)
+    return str(error) if resp is None else resp.reason
 
 
 class TvdbService(base.Service):
@@ -51,18 +46,14 @@ class TvdbService(base.Service):
             LOG.exception('search for series %s failed', series_id)
             return None, as_str(err)
 
-    def get_series_name(self, series, replacements):
+    def get_series_name(self, series):
         """Perform lookup for name of series
 
         :param object series: instance of a series
-        :param dict replacments: map of series name replacements
         :returns: name of series
         :rtype: str
         """
-        series_name = series.get('seriesName')
-        if replacements:
-            return replacements.get(series_name.lower(), series_name)
-        return series_name
+        return series.get('seriesName')
 
     def _get_epname(self, episodes, epno, absolute=False):
 

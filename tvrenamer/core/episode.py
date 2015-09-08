@@ -50,27 +50,28 @@ class Episode(object):
 
         self.formatted_filename = None
         self.formatted_dirname = None
+        self.out_location = None
 
         self.api = services.get_service()
         self.messages = []
         self.state = const.INIT
 
     def __str__(self):
-        return ('<{0}>:{1} => [{2} {3}|{4} {5}] '
-                'meta: [{6} S{7} E{8}] '
-                'formatted: {9}/{10}'.format(self.__class__.__name__,
-                                             self.original,
-                                             self.location,
-                                             self.name,
-                                             self.clean_name,
-                                             self.extension,
-                                             self.series_name or '',
-                                             self.season_number or '',
-                                             list(zip(
-                                                 self.episode_numbers or [],
-                                                 self.episode_names or [])),
-                                             self.formatted_dirname or '',
-                                             self.formatted_filename or ''))
+        return ('{0} => [{1} {2}|{3} {4}] '
+                'meta: [{5} S{6} E{7}] '
+                'formatted: {8}/{9}'.format(
+                    self.original,
+                    self.location,
+                    self.name,
+                    self.clean_name,
+                    self.extension,
+                    self.series_name or '',
+                    self.season_number or '',
+                    list(zip(
+                        self.episode_numbers or [],
+                        self.episode_names or [])),
+                    self.formatted_dirname or '',
+                    self.formatted_filename or ''))
 
     __repr__ = __str__
 
@@ -79,6 +80,7 @@ class Episode(object):
         try:
             self.parse()
             self.enhance()
+            self.format_name()
             self.rename()
             self.state = const.DONE
         except Exception as err:
@@ -106,16 +108,15 @@ class Episode(object):
 
         Structure of status:
 
-            original_filename => formatted_filename, state, result, messages
+            original_filename => formatted_filename, state, messages
 
         :returns: mapping of current processing state
         :rtype: dict
         """
         return {
             self.original: {
-                'formatted_filename': self.formatted_filename,
-                'progress': self.state,
-                'result': len(self.messages) == 0,
+                'formatted_filename': self.out_location,
+                'state': self.state,
                 'messages': '\n\t'.join(self.messages),
                 }
             }
@@ -202,9 +203,8 @@ class Episode(object):
                 output.get('pattern'))
             LOG.info(self.messages[-1])
             raise exc.ConfigValueError(self.messages[-1])
-        else:
-            self.series_name = formatter.clean_series_name(self.series_name)
 
+        self.series_name = formatter.clean_series_name(self.series_name)
         self.season_number = output.get('season_number')
 
     @tools.state(pre=const.PREENHANCE, post=const.POSTENHANCE)
@@ -224,8 +224,7 @@ class Episode(object):
             LOG.info(self.messages[-1])
             raise exc.ShowNotFound(str(error))
 
-        self.series_name = self.api.get_series_name(
-            series, cfg.CONF.output_series_replacements)
+        self.series_name = self.api.get_series_name(series)
         self.episode_names, error = self.api.get_episode_name(
             series, self.episode_numbers, self.season_number)
 
@@ -235,19 +234,28 @@ class Episode(object):
             raise exc.EpisodeNotFound(str(error))
 
     @tools.state(pre=const.PREFORMAT, post=const.POSTFORMAT)
-    def _format_filename(self):
+    def format_name(self):
+        """Formats the media file based on enhanced metadata.
 
+        The actual name of the file and even the name of the directory
+        structure where the file is to be stored.
+        """
         self.formatted_filename = formatter.format_filename(
             self.series_name, self.season_number,
             self.episode_numbers, self.episode_names,
             self.extension)
 
-        return self.formatted_filename
+        destination = self.location
+        if cfg.CONF.move_files_enabled:
+            self.formatted_dirname = formatter.format_dirname(
+                self.series_name, self.season_number)
+            library_base_path = tools.find_library(self.formatted_dirname,
+                                                   cfg.CONF.libraries,
+                                                   cfg.CONF.default_library)
+            destination = os.path.join(library_base_path,
+                                       self.formatted_dirname)
 
-    def _format_dirname(self):
-        self.formatted_dirname = formatter.format_dirname(
-            self.series_name, self.season_number)
-        return self.formatted_dirname
+        self.out_location = os.path.join(destination, self.formatted_filename)
 
     @tools.state(pre=const.PRENAME, post=const.POSTNAME)
     def rename(self):
@@ -258,18 +266,8 @@ class Episode(object):
         filename will be generated and the media file will be renamed
         to the generated name and optionally relocated.
         """
-
+        renamer.execute(self.original, self.out_location)
         if cfg.CONF.move_files_enabled:
-            library_base_path = tools.find_library(self._format_dirname(),
-                                                   cfg.CONF.libraries,
-                                                   cfg.CONF.default_library)
-            renamer.execute(self.original,
-                            os.path.join(library_base_path,
-                                         self.formatted_dirname,
-                                         self._format_filename()))
             LOG.debug('relocated: %s', self)
         else:
-            renamer.execute(self.original,
-                            os.path.join(self.location,
-                                         self._format_filename()))
             LOG.debug('renamed: %s', self)

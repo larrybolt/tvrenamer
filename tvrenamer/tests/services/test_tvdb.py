@@ -60,19 +60,8 @@ class TvdbServiceTest(base.BaseTest):
         self.assertIsNotNone(series)
         self.assertIsNone(err)
         self.assertEqual(
-            self.api.get_series_name(series,
-                                     self.CONF.output_series_replacements),
+            self.api.get_series_name(series),
             'The Big Bang Theory')
-
-        self.CONF.set_override('output_series_replacements',
-                               {'reign (2013)': 'reign'})
-        series, err = self.api.get_series_by_name('reign (2013)')
-        self.assertIsNotNone(series)
-        self.assertIsNone(err)
-        self.assertEqual(
-            self.api.get_series_name(series,
-                                     self.CONF.output_series_replacements),
-            'reign')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name(self):

@@ -8,5 +8,6 @@ six>=1.9.0
 sqlalchemy==0.9.8
 stevedore>=1.4.0
 titlecase>=0.7.2
+PrettyTable<0.8,>=0.7
 
 tvdbapi_client>=0.1.3

@@ -7,6 +7,7 @@ from oslo_config import cfg
 import six
 
 from tvrenamer import cache
+from tvrenamer.common import table
 from tvrenamer.common import tools
 from tvrenamer.core import episode
 
@@ -76,6 +77,7 @@ def _get_work(locations, processed):
 def _handle_results(results):
 
     output = {}
+    fields = []
     for res in results:
         output.update(res.status)
 
@@ -104,12 +106,14 @@ def _handle_results(results):
         # go any further.
         if LOG.isEnabledFor(logging.INFO):
             for epname, data in six.iteritems(res.status):
-                status = 'SUCCESS' if data.get('result') else 'FAILURE'
-                LOG.info('[%s]: %s --> %s', status, epname,
-                         data.get('formatted_filename'))
-                LOG.info('\tPROGRESS: %s', data.get('progress'))
-                if data.get('messages'):
-                    LOG.info('\tREASON: %s', data.get('messages'))
+                fields.append(
+                    [data.get('state'),
+                     epname,
+                     data.get('formatted_filename'),
+                     data.get('messages')])
+
+    if LOG.isEnabledFor(logging.INFO) and fields:
+        table.write_output(fields)
 
     return output
 
