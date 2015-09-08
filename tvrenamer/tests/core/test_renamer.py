@@ -12,9 +12,8 @@ class RenamerTest(base.BaseTest):
     def test_execute(self):
 
         with mock.patch.object(os.path, 'isfile', return_value=True):
-            self.assertRaises(OSError,
-                              renamer.execute,
-                              '/tmp/test_file.txt', 'Test_file.txt')
+            self.assertIsNone(
+                renamer.execute('/tmp/test_file.txt', 'Test_file.txt'))
 
         tempfile = self.create_tempfiles([('test_file', 'test data')])[0]
         new_file = os.path.join(os.path.dirname(tempfile), 'other_file.conf')

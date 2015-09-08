@@ -1,8 +1,6 @@
 import os
 
-import fixtures
 import testtools
-from tvdbapi_client import exceptions
 
 from tvrenamer.services import tvdb
 from tvrenamer.tests import base
@@ -17,13 +15,19 @@ class TvdbServiceTest(base.BaseTest):
 
     def setUp(self):
         super(TvdbServiceTest, self).setUp()
-        self.useFixture(fixtures.EnvironmentVariable(
-            'TVDB_API_KEY', os.environ.get('TEST_API_KEY')))
-        self.useFixture(fixtures.EnvironmentVariable(
-            'TVDB_USERNAME', os.environ.get('TEST_API_USER')))
-        self.useFixture(fixtures.EnvironmentVariable(
-            'TVDB_PASSWORD', os.environ.get('TEST_API_PASSWORD')))
 
+        self.CONF.set_override('apikey',
+                               os.environ.get('TEST_API_KEY'),
+                               'tvdb')
+        self.CONF.set_override('username',
+                               os.environ.get('TEST_API_USER'),
+                               'tvdb')
+        self.CONF.set_override('userpass',
+                               os.environ.get('TEST_API_PASSWORD'),
+                               'tvdb')
+        self.CONF.set_override('select_first',
+                               True,
+                               'tvdb')
         self.api = tvdb.TvdbService()
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
@@ -36,7 +40,7 @@ class TvdbServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_name('Fake - Unknown Series')
         self.assertIsNone(series)
         self.assertIsNotNone(err)
-        self.assertIsInstance(err, exceptions.TVDBRequestException)
+        self.assertEqual(err, 'Not Found')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_series_by_id(self):
@@ -48,7 +52,7 @@ class TvdbServiceTest(base.BaseTest):
         series, err = self.api.get_series_by_id(0)
         self.assertIsNone(series)
         self.assertIsNotNone(err)
-        self.assertIsInstance(err, exceptions.TVDBRequestException)
+        self.assertEqual(err, 'Not Found')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_series_name(self):
@@ -56,19 +60,8 @@ class TvdbServiceTest(base.BaseTest):
         self.assertIsNotNone(series)
         self.assertIsNone(err)
         self.assertEqual(
-            self.api.get_series_name(series,
-                                     self.CONF.output_series_replacements),
+            self.api.get_series_name(series),
             'The Big Bang Theory')
-
-        self.CONF.set_override('output_series_replacements',
-                               {'reign (2013)': 'reign'})
-        series, err = self.api.get_series_by_name('reign (2013)')
-        self.assertIsNotNone(series)
-        self.assertIsNone(err)
-        self.assertEqual(
-            self.api.get_series_name(series,
-                                     self.CONF.output_series_replacements),
-            'reign')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name(self):
@@ -84,7 +77,7 @@ class TvdbServiceTest(base.BaseTest):
         episodes, eperr = self.api.get_episode_name(series, [1], 2)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertIsInstance(eperr, exceptions.TVDBRequestException)
+        self.assertEqual(eperr, 'Not Found')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_attr_nf(self):
@@ -92,7 +85,7 @@ class TvdbServiceTest(base.BaseTest):
         episodes, eperr = self.api.get_episode_name(series, [1], 5)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertIsInstance(eperr, exceptions.TVDBRequestException)
+        self.assertEqual(eperr, 'Not Found')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_episode_nf(self):

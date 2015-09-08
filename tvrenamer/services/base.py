@@ -27,11 +27,10 @@ class Service(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_series_name(self, series, replacements):
+    def get_series_name(self, series):
         """Perform lookup for name of series
 
         :param object series: instance of a series
-        :param dict replacments: map of series name replacements
         :returns: name of series
         :rtype: str
         """

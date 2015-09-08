@@ -53,13 +53,13 @@ class EngineFacadeTestCase(base.BaseTest):
     @mock.patch('tvrenamer.cache.session.create_engine')
     def test_creation_from_config(self, create_engine, get_maker):
         conf = mock.MagicMock()
-        conf.database.items.return_value = [
+        conf.cache.items.return_value = [
             ('connection_debug', 100),
         ]
 
         session.EngineFacade.from_config('sqlite:///:memory:', conf)
 
-        conf.database.items.assert_called_once_with()
+        conf.cache.items.assert_called_once_with()
         create_engine.assert_called_once_with(
             sql_connection='sqlite:///:memory:',
             connection_debug=100,

@@ -117,7 +117,7 @@ class MediaFile(Base, HasId, HasTimestamp):
     __table_args__ = {
         'sqlite_autoincrement':  True,
     }
-    original = sa.Column(sa.String(255), unique=True)
+    original = sa.Column(sa.String(255))
     name = sa.Column(sa.String(100), default=None)
     extension = sa.Column(sa.String(20), default=None)
     location = sa.Column(sa.String(100), default=None)

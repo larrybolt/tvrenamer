@@ -7,23 +7,29 @@ from tvrenamer.tests import base
 
 class FormatterTest(base.BaseTest):
 
-    def test_replace_input_series_name(self):
+    def test_replace_series_name(self):
         self.CONF.set_override('input_series_replacements', dict())
         name = 'Reign'
-        self.assertEqual(formatter._replace_input_series_name(name),
-                         'Reign')
+        self.assertEqual(
+            formatter._replace_series_name(
+                name, self.CONF.input_series_replacements),
+            'Reign')
 
         self.CONF.set_override('input_series_replacements',
                                {'reign (2013)': 'reign'})
         name = 'Reign'
-        self.assertEqual(formatter._replace_input_series_name(name),
-                         'Reign')
+        self.assertEqual(
+            formatter._replace_series_name(
+                name, self.CONF.input_series_replacements),
+            'Reign')
 
         self.CONF.set_override('input_series_replacements',
                                {'reign': 'reign (2013)'})
         name = 'Reign'
-        self.assertEqual(formatter._replace_input_series_name(name),
-                         'reign (2013)')
+        self.assertEqual(
+            formatter._replace_series_name(
+                name, self.CONF.input_series_replacements),
+            'reign (2013)')
 
     def test_clean_series_name(self):
         self.CONF.set_override('input_series_replacements', dict())

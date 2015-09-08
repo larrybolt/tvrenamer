@@ -9,28 +9,17 @@ import titlecase as tc
 from tvrenamer.common import encodeutils
 from tvrenamer.common import tools
 
-cfg.CONF.import_opt('input_series_replacements', 'tvrenamer.options')
-cfg.CONF.import_opt('directory_name_format', 'tvrenamer.options')
-cfg.CONF.import_opt('filename_format_ep', 'tvrenamer.options')
-cfg.CONF.import_opt('episode_single', 'tvrenamer.options')
-cfg.CONF.import_opt('episode_separator', 'tvrenamer.options')
-cfg.CONF.import_opt('multiep_join_name_with', 'tvrenamer.options')
-cfg.CONF.import_opt('multiep_format', 'tvrenamer.options')
-cfg.CONF.import_opt('filename_character_blacklist', 'tvrenamer.options')
-cfg.CONF.import_opt('replacement_character', 'tvrenamer.options')
-cfg.CONF.import_opt('output_filename_replacements', 'tvrenamer.options')
-
 tc.ALL_CAPS = re.compile(r'^[A-Z\s%s]+$' % tc.PUNCT)
 
 
-def _replace_input_series_name(seriesname):
+def _replace_series_name(seriesname, replacements):
     """Performs replacement of series name.
 
     Allow specified replacements of series names in cases where default
     filenames match the wrong series, e.g. missing year gives wrong answer,
     or vice versa. This helps the TVDB query get the right match.
     """
-    for pat, replacement in six.iteritems(cfg.CONF.input_series_replacements):
+    for pat, replacement in six.iteritems(replacements):
         if re.match(pat, seriesname, re.IGNORECASE | re.UNICODE):
             return replacement
     return seriesname
@@ -58,7 +47,8 @@ def clean_series_name(seriesname):
     seriesname = re.sub('[.](\D)', ' \\1', seriesname)
     seriesname = seriesname.replace('_', ' ')
     seriesname = re.sub('-$', '', seriesname)
-    return _replace_input_series_name(seriesname.strip())
+    return _replace_series_name(seriesname.strip(),
+                                cfg.CONF.input_series_replacements)
 
 
 def _format_episode_numbers(episodenumbers):
@@ -213,15 +203,16 @@ def format_filename(series_name, season_number,
     """
 
     epdata = {
-        'seriesname': series_name,
+        'seriesname': tc.titlecase(_replace_series_name(
+            series_name, cfg.CONF.output_series_replacements) or ''),
         'seasonnumber': season_number,
         'episode': _format_episode_numbers(episode_numbers),
-        'episodename': _format_episode_name(episode_names),
+        'episodename': tc.titlecase(_format_episode_name(episode_names)),
         'ext': extension,
         }
 
     value = tools.apply_replacements(
-        tc.titlecase(cfg.CONF.filename_format_ep % epdata),
+        cfg.CONF.filename_format_ep % epdata,
         cfg.CONF.output_filename_replacements)
 
     return _make_valid_filename(value)
@@ -237,7 +228,8 @@ def format_dirname(series_name, season_number):
     """
 
     data = {
-        'seriesname': _make_valid_filename(series_name),
+        'seriesname': _replace_series_name(
+            series_name, cfg.CONF.output_series_replacements),
         'seasonnumber': season_number,
         }
 

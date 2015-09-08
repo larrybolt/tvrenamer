@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import uuid
 
 import mock
@@ -46,7 +48,7 @@ class ManagerProcessTests(base.BaseTest):
         ep1.status = {
             '/tmp/Lucy.2014.576p.BDRip.AC3.x264.DuaL-EAGLE.mkv': {
                 'formatted_filename': None,
-                'result': False,
+                'state': 'failed',
                 'messages': 'Could not find season 20'}
             }
         results.append(ep1)
@@ -55,7 +57,7 @@ class ManagerProcessTests(base.BaseTest):
         ep2.status = {
             '/tmp/revenge.412.hdtv-lol.mp4': {
                 'formatted_filename': 'S04E12-Madness.mp4',
-                'result': True,
+                'state': 'finished',
                 'messages': None}
             }
         results.append(ep2)
@@ -63,7 +65,7 @@ class ManagerProcessTests(base.BaseTest):
 
     def test_handle_results(self):
 
-        self.CONF.set_override('enabled', False, 'database')
+        self.CONF.set_override('cache_enabled', False)
 
         with mock.patch.object(manager.LOG, 'isEnabledFor',
                                return_value=False):
@@ -71,13 +73,14 @@ class ManagerProcessTests(base.BaseTest):
 
         with mock.patch.object(manager.LOG, 'isEnabledFor',
                                return_value=True):
-            with mock.patch.object(manager.LOG, 'info') as mock_log_info:
+            with mock.patch.object(manager.table,
+                                   'write_output') as mock_output:
                 manager._handle_results([])
-                self.assertEqual(mock_log_info.call_count, 0)
+                self.assertFalse(mock_output.called)
 
-            with mock.patch.object(manager.LOG, 'info') as mock_log_info:
+            with mock.patch('six.moves.builtins.print') as mock_print:
                 manager._handle_results(self._make_data())
-                self.assertEqual(mock_log_info.call_count, 5)
+                self.assertTrue(mock_print.called)
 
     def test_get_work(self):
 

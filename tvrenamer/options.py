@@ -16,6 +16,9 @@ CLI_OPTS = [
     cfg.BoolOpt('cron',
                 default=False,
                 help='Disable console output when running via cron'),
+    cfg.BoolOpt('cache_enabled',
+                default=False,
+                help='Enable caching results'),
     cfg.IntOpt('max_processes',
                default=4,
                help='max processes to use for performing sync of torrents'),
@@ -34,15 +37,7 @@ CLI_OPTS = [
                         'info',
                         'debug',
                         'trace']),
-    cfg.StrOpt('logconfig',
-               metavar='LOG_CONFIG',
-               default='',
-               help='specific path and filename of logging configuration '
-                    '(override defaults)'),
 ]
-
-cfg.CONF.register_cli_opts(CLI_OPTS)
-
 
 EPISODE_OPTS = [
     cfg.BoolOpt('move_files_enabled',
@@ -78,10 +73,7 @@ EPISODE_OPTS = [
     cfg.StrOpt('lookup_service',
                default='tvdb',
                help='Name of lookup service to use for metadata retrieval.'),
-    ]
-
-cfg.CONF.register_opts(EPISODE_OPTS)
-
+]
 
 FORMAT_OPTS = [
     # Destination to move files to. Trailing slash is not necessary.
@@ -122,9 +114,27 @@ FORMAT_OPTS = [
     cfg.ListOpt('output_filename_replacements',
                 default=[],
                 help='List of mappings of string pattern replacements.'),
-    ]
+]
 
-cfg.CONF.register_opts(FORMAT_OPTS)
+CACHE_OPTS = [
+    cfg.StrOpt('connection',
+               default='sqlite:///$config_dir/cache.db',
+               help='The connection string used to connect to the database'),
+    cfg.IntOpt('idle_timeout',
+               default=3600,
+               help='Timeout before idle sql connections are reaped'),
+    cfg.IntOpt('connection_debug',
+               default=0,
+               help='Verbosity of SQL debugging information. 0=None, 100=All'),
+]
+
+
+def register_opts(conf):
+    """Configure options within configuration library."""
+    conf.register_cli_opts(CLI_OPTS)
+    conf.register_opts(EPISODE_OPTS)
+    conf.register_opts(FORMAT_OPTS)
+    conf.register_opts(CACHE_OPTS, 'cache')
 
 
 def list_opts():
@@ -142,5 +152,14 @@ def list_opts():
     :returns: a list of (group_name, opts) tuples
     """
     from tvrenamer.common import tools
-    all_opts = [CLI_OPTS, EPISODE_OPTS, FORMAT_OPTS]
-    return tools.make_opt_list(all_opts, None)
+    all_opts = []
+    all_opts.extend(tools.make_opt_list([CLI_OPTS,
+                                         EPISODE_OPTS,
+                                         FORMAT_OPTS], None))
+    all_opts.extend(tools.make_opt_list([CACHE_OPTS], 'cache'))
+    try:
+        from tvdbapi_client import options
+        all_opts.extend(tools.make_opt_list([options.OPTS], 'tvdb'))
+    except ImportError:
+        pass
+    return all_opts

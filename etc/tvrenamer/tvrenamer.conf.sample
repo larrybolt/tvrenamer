@@ -4,32 +4,48 @@
 # From tvrenamer.opts
 #
 
-# Disable console output when running via cron (boolean value)
-#cron = false
-
-# Default library path to relocate files to. (string value)
-#default_library =
-
-# Format for naming library directories. (string value)
-#directory_name_format = .
+# specify the paths to search for files to rename. (multi valued)
+#locations =
 
 # Practice run where no changes are applied. (boolean value)
 #dryrun = false
 
-# Separator to join multiple episode numbers. (string value)
-#episode_separator = -
+# Disable console output when running via cron (boolean value)
+#cron = false
 
-# Format for episode numbers. (string value)
-#episode_single = %02d
+# Enable caching results (boolean value)
+#cache_enabled = false
+
+# max processes to use for performing sync of torrents (integer value)
+#max_processes = 4
+
+# specify name of log file default: %(default)s (string value)
+#logfile = tvrenamer.log
+
+# specify logging level to log messages: %(choices)s (string value)
+# Allowed values: none, critical, error, warning, info, debug, trace
+#loglevel = info
+
+# Move files to library during rename. (boolean value)
+#move_files_enabled = false
+
+# Overwrite existing files during rename. (boolean value)
+#overwrite_file_enabled = false
+
+# Default library path to relocate files to. (string value)
+#default_library =
+
+# Library paths to relocate files to. (list value)
+#libraries =
+
+# Lanuage to lookup metadata in. (string value)
+#language = en
+
+# File extensions considered valid. (list value)
+#valid_extensions =
 
 # File names exclused from processing. (list value)
 #filename_blacklist =
-
-# Characters to ignore within filename. (string value)
-#filename_character_blacklist =
-
-# Format for naming files with episode name. (string value)
-#filename_format_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s - %(episodename)s%(ext)s
 
 # List of mappings of string pattern replacements. (list value)
 #input_filename_replacements =
@@ -37,45 +53,79 @@
 # Mapping of parsed series name to replacement values. (dict value)
 #input_series_replacements =
 
-# Lanuage to lookup metadata in. (string value)
-#language = en
+# Mapping of lookup series name to replacement values. (dict value)
+#output_series_replacements =
 
-# Library paths to relocate files to. (list value)
-#libraries =
+# Name of lookup service to use for metadata retrieval. (string value)
+#lookup_service = tvdb
 
-# specify the paths to search for files to rename. (multi valued)
-#locations =
+# Format for naming library directories. (string value)
+#directory_name_format = .
 
-# specific path and filename of logging configuration (override
-# defaults) (string value)
-#logconfig =
+# Format for naming files with episode name. (string value)
+#filename_format_ep = %(seriesname)s - %(seasonnumber)02dx%(episode)s - %(episodename)s%(ext)s
 
-# specify name of log file default: %(default)s (string value)
-#logfile = tvrenamer.log
+# Format for episode numbers. (string value)
+#episode_single = %02d
 
-# specify logging level to log messages: %(choices)s (string value)
-#loglevel = info
-
-# Move files to library during rename. (boolean value)
-#move_files_enabled = false
-
-# Format for naming multiple episodes. (string value)
-#multiep_format = %(epname)s (%(episodemin)s-%(episodemax)s)
+# Separator to join multiple episode numbers. (string value)
+#episode_separator = -
 
 # Separator to join multiple episodes. (string value)
 #multiep_join_name_with = ", "
 
-# List of mappings of string pattern replacements. (list value)
-#output_filename_replacements =
+# Format for naming multiple episodes. (string value)
+#multiep_format = %(epname)s (%(episodemin)s-%(episodemax)s)
 
-# Mapping of lookup series name to replacement values. (dict value)
-#output_series_replacements =
-
-# Overwrite existing files during rename. (boolean value)
-#overwrite_file_enabled = false
+# Characters to ignore within filename. (string value)
+#filename_character_blacklist =
 
 # Character used to replace invalid characters. (string value)
 #replacement_character = _
 
-# File extensions considered valid. (list value)
-#valid_extensions =
+# List of mappings of string pattern replacements. (list value)
+#output_filename_replacements =
+
+
+[cache]
+
+#
+# From tvrenamer.opts
+#
+
+# The connection string used to connect to the database (string value)
+#connection = sqlite:///$config_dir/cache.db
+
+# Timeout before idle sql connections are reaped (integer value)
+#idle_timeout = 3600
+
+# Verbosity of SQL debugging information. 0=None, 100=All (integer
+# value)
+#connection_debug = 0
+
+
+[tvdb]
+
+#
+# From tvrenamer.opts
+#
+
+# API key from your TVDB account ENV['TVDB_API_KEY'] (string value)
+#apikey = <None>
+
+# Username from your TVDB account ENV['TVDB_USERNAME'] (string value)
+#username = <None>
+
+# Password from your TVDB account ENV['TVDB_PASSWORD'] (string value)
+#userpass = <None>
+
+# the url for thetvdb api service (string value)
+#service_url = https://api-dev.thetvdb.com
+
+# flag for validating ssl certs for service url (https) (boolean
+# value)
+#verify_ssl_certs = true
+
+# flag for selecting first series from search results (boolean value)
+#select_first = false
+

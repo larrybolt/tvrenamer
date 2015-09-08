@@ -286,9 +286,14 @@ def get_expressions():
     :rtype: list
     """
 
-    if _EXPRESSIONS:
+    if len(_EXPRESSIONS) == len(FILENAME_PATTERNS):
         return _EXPRESSIONS
 
     for cpattern in FILENAME_PATTERNS:
         _EXPRESSIONS.append(re.compile(cpattern, re.VERBOSE))
     return _EXPRESSIONS
+
+
+# pre-load the regular expressions to avoid race condition
+# when multiple threads attempt to reference them.
+get_expressions()

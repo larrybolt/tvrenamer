@@ -123,4 +123,4 @@ class EngineFacade(object):
         LOG.debug('making connection using connect string: %s',
                   connection_string)
         return cls(sql_connection=connection_string,
-                   **dict(conf.database.items()))
+                   **dict(conf.cache.items()))

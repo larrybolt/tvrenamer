@@ -20,7 +20,7 @@ class EpisodeTest(base.BaseTest):
 
     def test_str_repr(self):
         ep = episode.Episode(self.media)
-        ep_str = '<Episode>:'
+        ep_str = ''
         ep_str += self.media
         ep_str += ' => ['
         ep_str += self.dirname
@@ -37,9 +37,10 @@ class EpisodeTest(base.BaseTest):
         ep = episode.Episode(self.media)
         with mock.patch.object(ep, 'parse'):
             with mock.patch.object(ep, 'enhance'):
-                with mock.patch.object(ep, 'rename'):
-                    ep()
-                    self.assertEqual(ep.state, episode.const.DONE)
+                with mock.patch.object(ep, 'format_name'):
+                    with mock.patch.object(ep, 'rename'):
+                        ep()
+                        self.assertEqual(ep.state, episode.const.DONE)
 
         ep = episode.Episode(self.media)
         with mock.patch.object(ep, 'parse', side_effect=OSError):
@@ -128,27 +129,31 @@ class EpisodeTest(base.BaseTest):
                                        return_value=(None, '')):
                     self.assertRaises(exc.EpisodeNotFound, ep.enhance)
 
-    def test_gen_filename(self):
+    def test_format_name(self):
         ep = episode.Episode(self.media)
         ep.series_name = 'Revenge'
         ep.season_number = 4
         ep.episode_numbers = [12]
         ep.episode_names = ['Madness']
-        self.assertEqual(ep._format_filename(),
+
+        self.CONF.set_override('move_files_enabled', False)
+        ep.format_name()
+        self.assertIsNone(ep.formatted_dirname)
+        self.assertEqual(ep.formatted_filename,
                          'Revenge - 04x12 - Madness.mp4')
+
         self.CONF.set_override(
             'filename_format_ep',
             'S%(seasonnumber)02dE%(episode)s-%(episodename)s%(ext)s')
-        self.assertEqual(ep._format_filename(), 'S04E12-Madness.mp4')
-
-    def test_gen_dirname(self):
-        ep = episode.Episode(self.media)
-        ep.series_name = 'Revenge'
-        ep.season_number = 4
-        self.assertEqual(ep._format_dirname(), '.')
         self.CONF.set_override('directory_name_format',
                                '%(seriesname)s/Season %(seasonnumber)02d')
-        self.assertEqual(ep._format_dirname(), 'Revenge/Season 04')
+        self.CONF.set_override('move_files_enabled', True)
+
+        with mock.patch.object(episode.tools, 'find_library',
+                               return_value='/tmp'):
+            ep.format_name()
+            self.assertEqual(ep.formatted_filename, 'S04E12-Madness.mp4')
+            self.assertEqual(ep.formatted_dirname, 'Revenge/Season 04')
 
     def test_rename(self):
         ep = episode.Episode(self.media)
@@ -158,6 +163,8 @@ class EpisodeTest(base.BaseTest):
         ep.episode_names = ['Madness']
 
         self.CONF.set_override('move_files_enabled', False)
+        ep.out_location = os.path.join(self.dirname,
+                                       'Revenge - 04x12 - Madness.mp4')
         with mock.patch.object(episode.renamer, 'execute') as mock_renamer:
             ep.rename()
             mock_renamer.assert_called_with(
@@ -165,10 +172,10 @@ class EpisodeTest(base.BaseTest):
                 os.path.join(self.dirname, 'Revenge - 04x12 - Madness.mp4'))
 
         self.CONF.set_override('move_files_enabled', True)
+        ep.out_location = os.path.join(
+            '/tmp', '.', 'Revenge - 04x12 - Madness.mp4')
         with mock.patch.object(episode.renamer, 'execute') as mock_renamer:
-            with mock.patch.object(episode.tools, 'find_library',
-                                   return_value='/tmp'):
-                ep.rename()
-                mock_renamer.assert_called_with(
-                    self.media,
-                    os.path.join('/tmp', '.', 'Revenge - 04x12 - Madness.mp4'))
+            ep.rename()
+            mock_renamer.assert_called_with(
+                self.media,
+                os.path.join('/tmp', '.', 'Revenge - 04x12 - Madness.mp4'))
