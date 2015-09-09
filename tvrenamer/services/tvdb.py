@@ -8,7 +8,7 @@ from tvrenamer.services import base
 LOG = logging.getLogger(__name__)
 
 
-def as_str(error):
+def _as_str(error):
     resp = getattr(error,  'response',  None)
     return str(error) if resp is None else resp.reason
 
@@ -31,7 +31,7 @@ class TvdbService(base.Service):
             return self.api.search_series(name=series_name), None
         except exceptions.TVDBRequestException as err:
             LOG.exception('search for series %s failed', series_name)
-            return None, as_str(err)
+            return None, _as_str(err)
 
     def get_series_by_id(self, series_id):
         """Perform lookup for series
@@ -44,7 +44,7 @@ class TvdbService(base.Service):
             return self.api.get_series(series_id), None
         except exceptions.TVDBRequestException as err:
             LOG.exception('search for series %s failed', series_id)
-            return None, as_str(err)
+            return None, _as_str(err)
 
     def get_series_name(self, series):
         """Perform lookup for name of series
@@ -83,7 +83,7 @@ class TvdbService(base.Service):
         except exceptions.TVDBRequestException as err:
             LOG.exception('episodes for series %s season no %s failed',
                           series.get('id'), season_number)
-            return None, as_str(err)
+            return None, _as_str(err)
 
         epnames = []
         for epno in episode_numbers:
