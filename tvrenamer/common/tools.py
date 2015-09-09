@@ -1,5 +1,4 @@
 import copy
-import functools
 import itertools
 import logging
 import os
@@ -205,24 +204,15 @@ def find_library(series_path, locations, default_location):
     return default_location
 
 
-def state(method=None, pre=None, post=None, attr='state'):
+def state(pre, post, attr='state'):
     """State decorator"""
 
-    # if called without method, it means we have been called with
-    # optional arguments, we return a decorator with optional arguments
-    # filled in. Next time around we'll be decorating
-    if method is None:
-        return functools.partial(state, pre=pre, post=post, attr=attr)
-
-    # functools makes sure that we don't lose the method details
-    # like method name or doc.
-    @six.wraps(method)
-    def inner(self, *args, **kwargs):
-        """Inner wrapper for apply pre/post states"""
-        if pre is not None:
+    def decorator(method):
+        @six.wraps(method)
+        def inner(self, *args, **kwargs):
             setattr(self, attr, pre)
-        result = method(self, *args, **kwargs)
-        if post is not None:
+            result = method(self, *args, **kwargs)
             setattr(self, attr, post)
-        return result
-    return inner
+            return result
+        return inner
+    return decorator

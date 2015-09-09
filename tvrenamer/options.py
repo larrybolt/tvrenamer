@@ -157,9 +157,4 @@ def list_opts():
                                          EPISODE_OPTS,
                                          FORMAT_OPTS], None))
     all_opts.extend(tools.make_opt_list([CACHE_OPTS], 'cache'))
-    try:
-        from tvdbapi_client import options
-        all_opts.extend(tools.make_opt_list([options.OPTS], 'tvdb'))
-    except ImportError:
-        pass
     return all_opts

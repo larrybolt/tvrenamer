@@ -107,7 +107,7 @@
 [tvdb]
 
 #
-# From tvrenamer.opts
+# From tvdbapi.opts
 #
 
 # API key from your TVDB account ENV['TVDB_API_KEY'] (string value)
@@ -128,4 +128,3 @@
 
 # flag for selecting first series from search results (boolean value)
 #select_first = false
-
