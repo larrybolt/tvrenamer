@@ -57,34 +57,12 @@ class EpisodeTest(base.BaseTest):
         ep = episode.Episode(self.media)
         self.assertTrue(self.media in ep.status)
 
-    def test_validate(self):
-        ep = episode.Episode(self.media)
-        self.assertTrue(ep.valid)
-
-        ep = episode.Episode(self.media)
-        with mock.patch.object(os, 'access', return_value=False):
-            self.assertFalse(ep.valid)
-
-        ep = episode.Episode(self.media)
-        with mock.patch.object(episode.tools, 'is_valid_extension',
-                               return_value=False):
-            self.assertFalse(ep.valid)
-
-        ep = episode.Episode(self.media)
-        with mock.patch.object(episode.tools, 'is_blacklisted_filename',
-                               return_value=True):
-            self.assertFalse(ep.valid)
-
     def test_parse(self):
         ep = episode.Episode(self.media)
         ep.parse()
         self.assertEqual(ep.episode_numbers, [12])
         self.assertEqual(ep.series_name, 'revenge')
         self.assertEqual(ep.season_number, 4)
-
-        ep = episode.Episode(self.media)
-        ep._valid = False
-        self.assertRaises(exc.NoValidFilesFoundError, ep.parse)
 
         ep = episode.Episode(self.media)
         with mock.patch.object(episode.parser, 'parse_filename',
@@ -138,7 +116,7 @@ class EpisodeTest(base.BaseTest):
 
         self.CONF.set_override('move_files_enabled', False)
         ep.format_name()
-        self.assertIsNone(ep.formatted_dirname)
+        self.assertEqual(ep.formatted_dirname, os.path.dirname(self.media))
         self.assertEqual(ep.formatted_filename,
                          'Revenge - 04x12 - Madness.mp4')
 
@@ -149,11 +127,11 @@ class EpisodeTest(base.BaseTest):
                                '%(seriesname)s/Season %(seasonnumber)02d')
         self.CONF.set_override('move_files_enabled', True)
 
-        with mock.patch.object(episode.tools, 'find_library',
-                               return_value='/tmp'):
+        with mock.patch('tvrenamer.core.formatter.find_library',
+                        return_value='/tmp'):
             ep.format_name()
             self.assertEqual(ep.formatted_filename, 'S04E12-Madness.mp4')
-            self.assertEqual(ep.formatted_dirname, 'Revenge/Season 04')
+            self.assertEqual(ep.formatted_dirname, '/tmp/Revenge/Season 04')
 
     def test_rename(self):
         ep = episode.Episode(self.media)

@@ -1,46 +1,24 @@
 from __future__ import print_function
 
-import uuid
+import os
+import tempfile
 
 import mock
 
+from tvrenamer.core import episode
 from tvrenamer import manager
 from tvrenamer.tests import base
-
-
-class SampleTask(object):
-
-    def __call__(self):
-        return {str(uuid.uuid4()): {'status': 'SUCCESS'}}
 
 
 class ManagerTests(base.BaseTest):
 
     def setUp(self):
         super(ManagerTests, self).setUp()
-        self.mgr = manager.Manager()
-        self.addCleanup(self.mgr.shutdown)
 
-    def test_manager(self):
-        self.assertTrue(self.mgr.empty())
-        _tasks = []
-        _tasks.append(SampleTask())
-        _tasks.append(SampleTask())
-        _tasks.append(SampleTask())
-
-        self.mgr.add_tasks(_tasks)
-        self.mgr.add_tasks(SampleTask())
-
-        self.assertFalse(self.mgr.empty())
-        self.assertEqual(len(self.mgr.tasks), 4)
-
-        results = self.mgr.run()
-        self.assertTrue(self.mgr.empty())
-        self.assertEqual(len(self.mgr.tasks), 0)
-        self.assertEqual(len(results), 4)
-
-
-class ManagerProcessTests(base.BaseTest):
+        dbfile = os.path.join(tempfile.mkdtemp(), 'cache.db')
+        self.CONF.set_override('connection',
+                               'sqlite:///' + dbfile,
+                               'cache')
 
     def _make_data(self):
         results = []
@@ -63,42 +41,41 @@ class ManagerProcessTests(base.BaseTest):
         results.append(ep2)
         return results
 
-    def test_handle_results(self):
+    @mock.patch.object(manager.LOG, 'isEnabledFor')
+    def test_handle_results(self, mock_log):
 
         self.CONF.set_override('cache_enabled', False)
+        mock_log.return_value = False
+        manager._handle_results([])
 
-        with mock.patch.object(manager.LOG, 'isEnabledFor',
-                               return_value=False):
+        mock_log.return_value = True
+        with mock.patch.object(manager.table, 'write_output') as mock_output:
             manager._handle_results([])
+            self.assertFalse(mock_output.called)
 
-        with mock.patch.object(manager.LOG, 'isEnabledFor',
-                               return_value=True):
-            with mock.patch.object(manager.table,
-                                   'write_output') as mock_output:
-                manager._handle_results([])
-                self.assertFalse(mock_output.called)
+        with mock.patch('six.moves.builtins.print') as mock_print:
+            manager._handle_results(self._make_data())
+            self.assertTrue(mock_print.called)
 
-            with mock.patch('six.moves.builtins.print') as mock_print:
-                manager._handle_results(self._make_data())
-                self.assertTrue(mock_print.called)
+    @mock.patch('tvrenamer.cache.save')
+    def test_cache_result(self, mock_cache):
 
-    def test_get_work(self):
+        ep = episode.Episode('/tmp/test_media.mp4')
+        ep.episode_numbers = [1, 2, 3]
+        ep.episode_names = ['the ep1', 'other ep2', 'final ep3']
+        ep.messages = ['Invalid file found',
+                       'Season not found',
+                       'Unknown episode'
+                       ]
 
-        locations = ['/tmp/download', '/downloads']
-        orig_files = ['/tmp/download/revenge.s04e12.hdtv.x264-2hd.mp4',
-                      '/tmp/download/Lucy.2014.720p.BluRay.x254-x0r.mkv']
-        with mock.patch.object(manager.tools, 'retrieve_files',
-                               return_value=orig_files):
-            self.assertEqual(len(manager._get_work(locations, {})), 2)
+        self.CONF.set_override('cache_enabled', False)
+        manager._cache_result(ep)
+        self.assertFalse(mock_cache.called)
 
-        with mock.patch.object(manager.tools, 'retrieve_files',
-                               return_value=orig_files):
-            self.assertEqual(
-                len(manager._get_work(
-                    locations,
-                    {'/tmp/download/revenge.s04e12.hdtv.x264-2hd.mp4': None,
-                     '/tmp/download/Lucy.2014.720p.BluRay.x254-x0r.mkv': None}
-                )), 0)
+        self.CONF.set_override('cache_enabled', True)
+        manager._cache_result(ep)
+        self.assertTrue(mock_cache.called)
 
-    def test_start(self):
-        self.skipTest('function runs as infinite loop')
+        mock_cache.side_effect = RuntimeError
+        manager._cache_result(ep)
+        self.assertTrue(mock_cache.called)

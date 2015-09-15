@@ -7,7 +7,6 @@ import six
 import titlecase as tc
 
 from tvrenamer.common import encodeutils
-from tvrenamer.common import tools
 
 tc.ALL_CAPS = re.compile(r'^[A-Z\s%s]+$' % tc.PUNCT)
 
@@ -49,6 +48,58 @@ def clean_series_name(seriesname):
     seriesname = re.sub('-$', '', seriesname)
     return _replace_series_name(seriesname.strip(),
                                 cfg.CONF.input_series_replacements)
+
+
+def apply_replacements(cfile, replacements):
+    """Applies custom replacements.
+
+    mapping(dict), where each dict contains:
+        'match' - filename match pattern to check against, the filename
+        replacement is applied.
+
+        'replacement' - string used to replace the matched part of the filename
+
+        'is_regex' - if True, the pattern is treated as a
+        regex. If False, simple substring check is used (if
+        'match' in filename). Default is False
+
+        'with_extension' - if True, the file extension is not included in the
+        pattern matching. Default is False
+
+    Example replacements::
+
+        {'match': ':',
+         'replacement': '-',
+         'is_regex': False,
+         'with_extension': False,
+         }
+
+    :param str cfile: name of a file
+    :param list replacements: mapping(dict) filename pattern matching
+                              directives
+    :returns: formatted filename
+    :rtype: str
+    """
+    if not replacements:
+        return cfile
+
+    for rep in replacements:
+        if not rep.get('with_extension', False):
+            # By default, preserve extension
+            cfile, cext = os.path.splitext(cfile)
+        else:
+            cfile = cfile
+            cext = ''
+
+        if 'is_regex' in rep and rep['is_regex']:
+            cfile = re.sub(rep['match'], rep['replacement'], cfile)
+        else:
+            cfile = cfile.replace(rep['match'], rep['replacement'])
+
+        # Rejoin extension (cext might be empty-string)
+        cfile = cfile + cext
+
+    return cfile
 
 
 def _format_episode_numbers(episodenumbers):
@@ -211,7 +262,7 @@ def format_filename(series_name, season_number,
         'ext': extension,
         }
 
-    value = tools.apply_replacements(
+    value = apply_replacements(
         cfg.CONF.filename_format_ep % epdata,
         cfg.CONF.output_filename_replacements)
 
@@ -234,3 +285,32 @@ def format_dirname(series_name, season_number):
         }
 
     return tc.titlecase(cfg.CONF.directory_name_format % data)
+
+
+def find_library(series_path):
+    """Search for the location of a series within the library.
+
+    :param str series_path: name of the relative path of the series
+    :returns: library path
+    :rtype: str
+    """
+
+    for location in cfg.CONF.libraries:
+        if os.path.isdir(os.path.join(location, series_path)):
+            return location
+        # already tried the full path; now walk down the path
+        segments = series_path.split(os.sep)[:-1]
+        while segments:
+            seg_path = os.path.join(*segments)
+            # if the directory exists then we found our location
+            if os.path.isdir(os.path.join(location, seg_path)):
+                return location
+            # remove the last element and try again
+            segments = segments[:-1]
+
+    return cfg.CONF.default_library
+
+
+def format_location(series_name, season_number):
+    dirname = format_dirname(series_name, season_number)
+    return os.path.join(find_library(dirname), dirname)

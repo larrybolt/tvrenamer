@@ -1,12 +1,13 @@
-pbr>=1.1.1
+pbr>=1.6.0
 twine
 
-futures
+eventlet>=0.17.4
+greenlet>=0.3.2
 oslo.config>=1.9.0
 lockfile
 six>=1.9.0
 sqlalchemy>=1.0.2,<1.1
-stevedore>=1.4.0
+stevedore>=1.5.0
 titlecase>=0.7.2
 PrettyTable<0.8,>=0.7
 

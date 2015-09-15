@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = tvrenamer
-omit = tvrenamer/tests/*, tvrenamer/common/encodeutils.py
+omit = tvrenamer/tests/*, tvrenamer/common/encodeutils.py, tvrenamer/common/_service.py
 
 [report]
 ignore-errors = True
