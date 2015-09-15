@@ -45,6 +45,36 @@ class FormatterTest(base.BaseTest):
         self.assertEqual(formatter.clean_series_name(name),
                          'an example 1.0 test')
 
+    def test_apply_replacements(self):
+        self.assertEqual('sample.avi',
+                         formatter.apply_replacements('sample.avi', None))
+        self.assertEqual('sample.avi',
+                         formatter.apply_replacements('sample.avi', []))
+
+        reps = [{'match': '_test',
+                 'replacement': '',
+                 'with_extension': False,
+                 'is_regex': False},
+                ]
+        self.assertEqual('sample.avi',
+                         formatter.apply_replacements('sample_test.avi', reps))
+
+        reps = [{'match': '_test',
+                 'replacement': '',
+                 'with_extension': True,
+                 'is_regex': False},
+                ]
+        self.assertEqual('sample.avi',
+                         formatter.apply_replacements('sample_test.avi', reps))
+
+        reps = [{'match': '[ua]+',
+                 'replacement': 'x',
+                 'with_extension': False,
+                 'is_regex': True},
+                ]
+        self.assertEqual('sxmple_test.avi',
+                         formatter.apply_replacements('sample_test.avi', reps))
+
     def test_format_episode_numbers(self):
         epnums = [1]
         self.assertEqual(formatter._format_episode_numbers(epnums),
@@ -204,3 +234,26 @@ class FormatterTest(base.BaseTest):
             '%(seriesname)s/Season %(seasonnumber)02d')
         self.assertEqual(formatter.format_dirname('Sample Series', 2),
                          'Sample Series/Season 02')
+
+    @mock.patch('os.path.isdir')
+    def test_find_library(self, mock_isdir):
+        series_path = 'The Big Bang Theory/Season 01'
+        locations = ['\\NAS/Share/Video/Current',
+                     '\\NAS/Share/Video/Offair',
+                     '/local/video']
+        default_location = '\\NAS/Share/Video/TBD'
+
+        self.CONF.set_override('libraries', locations)
+        self.CONF.set_override('default_library', default_location)
+
+        mock_isdir.return_value = True
+        result = formatter.find_library(series_path)
+        self.assertEqual(result, '\\NAS/Share/Video/Current')
+
+        mock_isdir.return_value = False
+        result = formatter.find_library(series_path)
+        self.assertEqual(result, default_location)
+
+        mock_isdir.side_effect = (False, False, False, False, False, True)
+        result = formatter.find_library(series_path)
+        self.assertEqual(result, '/local/video')
