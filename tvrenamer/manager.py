@@ -1,151 +1,66 @@
 """Manages the execution of tasks using parallel processes."""
 import logging
-import time
 
-import concurrent.futures as conc_futures
 from oslo_config import cfg
-import six
 
-from tvrenamer import cache
-from tvrenamer.common import table
-from tvrenamer.common import tools
+from tvrenamer.common import _service
 from tvrenamer.core import episode
+from tvrenamer.core import watcher
+from tvrenamer import processors
 
 LOG = logging.getLogger(__name__)
 
 
-class Manager(object):
-    """Manages a pool of processes and tasks.
+class _RenamerService(_service.Service):
 
-    Executes the supplied tasks using the process pool.
-    """
+    def __init__(self, processor_mgr):
+        super(_RenamerService, self).__init__()
+        self.processor_mgr = processor_mgr
+        self.watcher = watcher.FileWatcher()
+        self.files = []
 
-    def __init__(self):
-        self.executor = conc_futures.ThreadPoolExecutor(
-            cfg.CONF.max_processes)
-        self.tasks = []
+    def _on_done(self, gt, *args, **kwargs):
+        finished_ep = gt.wait()
+        self.processor_mgr.map_method('process', [finished_ep])
 
-    def empty(self):
-        """Checks if there are any tasks pending.
+    def _files_found(self, gt, *args, **kwargs):
+        self.files = gt.wait()
 
-        :returns: True if no tasks else False
-        :rtype: bool
-        """
-        return not self.tasks
+    def _process_files(self):
+        for file in self.files:
+            th = self.tg.add_thread(episode.Episode(file))
+            th.link(self._on_done)
 
-    def add_tasks(self, tasks):
-        """Adds tasks to list of tasks to be executed.
+        self.tg.wait()
 
-        :param tasks: a task or list of tasks to add to the list of
-                      tasks to execute
-        """
-        if isinstance(tasks, list):
-            self.tasks.extend(tasks)
-        else:
-            self.tasks.append(tasks)
+    def start(self):
+        super(_RenamerService, self).start()
+        LOG.info('RenamerService starting...')
 
-    def run(self):
-        """Executes the list of tasks.
-
-        :return: the result/output from each tasks
-        :rtype: list
-        """
-        futures_task = [self.executor.submit(task) for task in self.tasks]
-        # always delete the tasks from task list to avoid duplicate execution
-        # retrying of a task will be handled by the process that feeds us
-        # the tasks.
-        del self.tasks[:]
-
-        results = []
-        for future in conc_futures.as_completed(futures_task):
-            results.append(future.result())
-        return results
-
-    def shutdown(self):
-        """Shuts down the process pool to free up resources."""
-        self.executor.shutdown()
-
-
-def _get_work(locations, processed):
-    episodes = []
-    for file in tools.retrieve_files(locations):
-        if file not in processed:
-            episodes.append(episode.Episode(file))
-    return episodes
-
-
-def _handle_results(results):
-
-    output = {}
-    fields = []
-    for res in results:
-        output.update(res.status)
-
-        if cfg.CONF.cache_enabled:
-            try:
-                cache.dbapi().save(cache.MediaFile(
-                    original=res.original,
-                    name=res.name,
-                    extension=res.extension,
-                    location=res.location,
-                    clean_name=res.clean_name,
-                    series_name=res.series_name,
-                    season_number=res.season_number,
-                    episode_numbers=','.join(
-                        str(e) for e in res.episode_numbers or []),
-                    episode_names=','.join(res.episode_names or []),
-                    formatted_filename=res.formatted_filename,
-                    formatted_dirname=res.formatted_dirname,
-                    state=res.state,
-                    messages='\n'.join(res.messages)
-                    ))
-            except Exception:
-                LOG.exception('failed to cache result: %s', res.status)
-
-        # if logging is not enabled then no need to
-        # go any further.
-        if LOG.isEnabledFor(logging.INFO):
-            for epname, data in six.iteritems(res.status):
-                fields.append(
-                    [data.get('state'),
-                     epname,
-                     data.get('formatted_filename'),
-                     data.get('messages')])
-
-    if LOG.isEnabledFor(logging.INFO) and fields:
-        table.write_output(fields)
-
-    return output
-
-
-def start():
-    """Entry point to start the processing.
-
-    :returns: results from processing each file found
-    :rtype: dict
-    """
-
-    mgr = Manager()
-    locations = cfg.CONF.locations or []
-    results = {}
-
-    LOG.info('tvrenamer daemon starting up...')
-    try:
         while True:
-            # attempt to add tasks to the manager
-            mgr.add_tasks(_get_work(locations, results))
+            th = self.tg.add_thread(self.watcher.run)
+            th.link(self._files_found)
+            self.tg.wait()
+            self._process_files()
 
-            # if no work to do take a break and try again
-            if mgr.empty():
-                time.sleep(.5)
-                continue
+    def stop(self):
+        LOG.info('RenamerService shutting down.')
+        super(_RenamerService, self).stop()
 
-            # process the work
-            results.update(_handle_results(mgr.run()))
 
-    except KeyboardInterrupt:
-        # we were asked to stop from command line so simply stop
-        pass
-    finally:
-        LOG.info('tvrenamer daemon shutting down...')
-        mgr.shutdown()
+def _start(processor_mgr):
+    outputs = []
+    for file in watcher.retrieve_files():
+        ep = episode.Episode(file)
+        # process the work
+        outputs.append(ep())
+
+    processor_mgr.map_method('process', outputs)
+
+
+def run():
+    """Entry point to start the processing."""
+    if cfg.CONF.cron:
+        _service.launch(cfg.CONF, _RenamerService(processors.load())).wait()
+    else:
+        _start(processors.load())

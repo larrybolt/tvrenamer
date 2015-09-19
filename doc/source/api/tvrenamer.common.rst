@@ -4,6 +4,14 @@ tvrenamer.common package
 Submodules
 ----------
 
+tvrenamer.common.table module
+-----------------------------
+
+.. automodule:: tvrenamer.common.table
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tvrenamer.common.tools module
 -----------------------------
 

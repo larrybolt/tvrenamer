@@ -11,5 +11,5 @@ from tvrenamer import service
 @lockfile.locked(os.path.join(tempfile.gettempdir(), __package__), timeout=10)
 def main():
     service.prepare_service()
-    manager.start()
+    manager.run()
     return 0

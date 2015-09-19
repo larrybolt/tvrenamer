@@ -112,7 +112,7 @@ class HasTimestamp(object):
 
 
 class MediaFile(Base, HasId, HasTimestamp):
-    """Class representing a torrent in the database"""
+    """Class representing a series media file processed."""
 
     __table_args__ = {
         'sqlite_autoincrement':  True,

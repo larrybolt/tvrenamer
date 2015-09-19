@@ -1,6 +1,6 @@
 Available Data Services
 =======================
 
-.. list-plugins:: data.services
+.. list-plugins:: tvrenamer.data.services
     :detailed:
 

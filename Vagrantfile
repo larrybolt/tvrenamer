@@ -15,6 +15,8 @@ fi
 pip -q install -U docker-compose tox invoke
 curl -sSL https://raw.githubusercontent.com/docker/compose/1.2.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
 wget --no-check-certificate -q  https://raw.github.com/petervanderdoes/gitflow/develop/contrib/gitflow-installer.sh && bash gitflow-installer.sh install develop; rm gitflow-installer.sh; rm -rf gitflow/
+
+apt-get install -y -q python-dev python3-dev --no-install-recommends
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!

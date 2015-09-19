@@ -1,10 +1,10 @@
 """Provides access to cache API for saving data."""
 from oslo_config import cfg
+import six
 
 from tvrenamer.cache import api
 from tvrenamer.cache import models
 
-MediaFile = models.MediaFile
 _DBAPI = None
 
 
@@ -22,3 +22,22 @@ def dbapi(conf=cfg.CONF):
         _DBAPI = api.Connection(conf)
         _DBAPI.shrink_db()
     return _DBAPI
+
+
+def save(instance):
+    """Saves an instance of an episode in the cache.
+
+    :param tvrenamer.core.episode.Episode instance: an instance of an episode
+    :return: media file cache instance
+    :rtype: :class:`~tvrenamer.cache.models.MediaFile`
+    """
+    mf = models.MediaFile()
+    for name, value in six.iteritems(instance.__dict__):
+        if name.startswith('_'):
+            continue
+        if hasattr(mf, name):
+            if isinstance(value, list):
+                value = ','.join(str(v) for v in value)
+            setattr(mf, name, value)
+
+    return dbapi().save(mf)

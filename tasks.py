@@ -41,12 +41,17 @@ def next_release(major=False, minor=False, patch=True):
 
     prev = run('git describe --abbrev=0 --tags', warn=True, hide=True).stdout or '0.0.0'
     ver = semantic_version.Version.coerce(prev.strip())
+    print('current version:', ver)
     if major:
+        print('next major release:', ver.next_major())
         return ver.next_major()
     if minor:
+        print('next minor release:', ver.next_minor())
         return ver.next_minor()
     if patch:
+        print('next patch release:', ver.next_patch())
         return ver.next_patch()
+    print('next release <undefined>')
     return None
 
 

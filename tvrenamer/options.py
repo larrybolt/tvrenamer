@@ -19,9 +19,6 @@ CLI_OPTS = [
     cfg.BoolOpt('cache_enabled',
                 default=False,
                 help='Enable caching results'),
-    cfg.IntOpt('max_processes',
-               default=4,
-               help='max processes to use for performing sync of torrents'),
     cfg.StrOpt('logfile',
                metavar='LOG_FILE',
                default=DEFAULT_LOG_FILENAME,
@@ -157,9 +154,4 @@ def list_opts():
                                          EPISODE_OPTS,
                                          FORMAT_OPTS], None))
     all_opts.extend(tools.make_opt_list([CACHE_OPTS], 'cache'))
-    try:
-        from tvdbapi_client import options
-        all_opts.extend(tools.make_opt_list([options.OPTS], 'tvdb'))
-    except ImportError:
-        pass
     return all_opts

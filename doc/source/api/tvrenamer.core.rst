@@ -44,6 +44,14 @@ tvrenamer.core.renamer module
     :undoc-members:
     :show-inheritance:
 
+tvrenamer.core.watcher module
+-----------------------------
+
+.. automodule:: tvrenamer.core.watcher
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
