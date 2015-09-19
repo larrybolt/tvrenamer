@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.2.0
+-----
+
+* [RELEASE] Update to version v0.2.0
+* [TASK] Add print version to next_release task
+* [TASK] Remove unused exceptions
+* [FEATURE] Implement result processors
+* [FEATURE] Enable daemon mode
+* [TASK] Add metadata homepage-url
+* [TASK] Documentation updates
+* [TASK] Dependent options and improved coverage
+
 0.1.3
 -----
 
