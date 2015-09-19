@@ -6,22 +6,12 @@ class BaseTvRenamerException(Exception):
     pass
 
 
-class NoValidFilesFoundError(BaseTvRenamerException):
-    """Raised when no valid files are found. Effectively exits tvrenamer."""
-    pass
-
-
 class InvalidFilename(BaseTvRenamerException):
     """Raised when a file is parsed, but no episode info can be found."""
     pass
 
 
-class BaseConfigError(BaseTvRenamerException):
-    """Base exception for config errors."""
-    pass
-
-
-class ConfigValueError(BaseConfigError):
+class ConfigValueError(BaseTvRenamerException):
     """Raised if the config file is malformed or unreadable."""
     pass
 

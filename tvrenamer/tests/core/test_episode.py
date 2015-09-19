@@ -49,7 +49,7 @@ class EpisodeTest(base.BaseTest):
 
         ep = episode.Episode(self.media)
         with mock.patch.object(ep, 'parse',
-                               side_effect=exc.NoValidFilesFoundError):
+                               side_effect=exc.InvalidFilename):
             ep()
             self.assertEqual(ep.state, episode.const.FAILED)
 

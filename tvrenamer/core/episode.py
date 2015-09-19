@@ -133,8 +133,6 @@ class Episode(object):
     def parse(self):
         """Extracts component keys from filename.
 
-        :raises tvrenamer.exceptions.NoValidFilesFoundError:
-            when episode did not pass validations
         :raises tvrenamer.exceptions.InvalidFilename:
             when filename was not parseable
         :raises tvrenamer.exceptions.ConfigValueError:
