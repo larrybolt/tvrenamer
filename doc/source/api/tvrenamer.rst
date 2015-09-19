@@ -9,6 +9,7 @@ Subpackages
     tvrenamer.cache
     tvrenamer.common
     tvrenamer.core
+    tvrenamer.processors
     tvrenamer.services
 
 Submodules

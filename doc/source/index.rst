@@ -6,6 +6,7 @@ Contents:
     :maxdepth: 1
 
     services
+    results_processors
     options
     api/modules
     ChangeLog

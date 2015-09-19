@@ -9,15 +9,13 @@ def get_service():
     global _SERVICE_MANAGER
 
     if _SERVICE_MANAGER is None:
-        _SERVICE_MANAGER = driver.DriverManager(namespace='data.services',
-                                                name=cfg.CONF.lookup_service,
-                                                invoke_on_load=True)
+        _SERVICE_MANAGER = driver.DriverManager(
+            namespace='tvrenamer.data.services',
+            name=cfg.CONF.lookup_service,
+            invoke_on_load=True)
     return _SERVICE_MANAGER.driver
 
 
 def load_service_opts(conf):
     """Load configuration options for services."""
-    try:
-        conf.import_group('tvdb', 'tvdbapi_client.options')
-    except ImportError:
-        pass
+    conf.import_group('tvdb', 'tvdbapi_client.options')
