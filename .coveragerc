@@ -4,7 +4,7 @@ source = tvrenamer
 omit = tvrenamer/tests/*, tvrenamer/common/encodeutils.py, tvrenamer/common/_service.py
 
 [report]
-ignore-errors = True
+ignore_errors = True
 
 exclude_lines =
     # Have to re-enable the standard pragma
