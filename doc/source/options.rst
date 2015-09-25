@@ -6,3 +6,7 @@ Available Configuration Options
 
 .. show-options:: tvdbapi.opts
 
+
+.. show-options:: trakt.opts
+
+

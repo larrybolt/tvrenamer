@@ -16,9 +16,6 @@
 # Enable caching results (boolean value)
 #cache_enabled = false
 
-# max processes to use for performing sync of torrents (integer value)
-#max_processes = 4
-
 # specify name of log file default: %(default)s (string value)
 #logfile = tvrenamer.log
 
@@ -102,6 +99,21 @@
 # Verbosity of SQL debugging information. 0=None, 100=All (integer
 # value)
 #connection_debug = 0
+
+
+[trakt]
+
+#
+# From trakt.opts
+#
+
+# client id from your trakt account ENV['TRAKT_CLIENT_ID'] (string
+# value)
+#client_id = <None>
+
+# client secret from your trakt account ENV['TRAKT_CLIENT_SECRET']
+# (string value)
+#client_secret = <None>
 
 
 [tvdb]
