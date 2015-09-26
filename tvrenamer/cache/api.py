@@ -1,14 +1,13 @@
-"""Private database API implemented for sqlalchemy for database operations."""
+"""Private database API implemented for database operations."""
 import logging
 
-from tvrenamer.cache import models as db_model
-from tvrenamer.cache import session as db_session
+import tinydb
 
 LOG = logging.getLogger(__name__)
 
 
-class Connection(object):
-    """SQLAlchemy connection."""
+class DatabaseAPI(object):
+    """Public APIs to perform on the database."""
 
     def __init__(self, conf):
         """Initialize new instance.
@@ -17,34 +16,43 @@ class Connection(object):
         :type conf: oslo_config.cfg.ConfigOpts
         """
         self.conf = conf
-        self._engine_facade = db_session.EngineFacade.from_config(
-            conf.cache.connection, conf)
-        self.upgrade()
-
-    def upgrade(self):
-        """Migrate the database to `version` or most recent version."""
-        engine = self._engine_facade.engine
-        db_model.verify_tables(engine)
-        engine.dispose()
+        self.db = tinydb.TinyDB(conf.cache.dbfile)
 
     def clear(self):
         """Clear database."""
-        engine = self._engine_facade.engine
-        db_model.purge_all_tables(engine)
-        self._engine_facade.session_maker.close_all()
-        engine.dispose()
+        self.db.purge_tables()
 
-    def shrink_db(self):
-        """Shrink database."""
-        engine = self._engine_facade.engine
-        with engine.begin() as conn:
-            conn.execute('VACUUM')
-            LOG.debug('db space reclaimed')
+    def update(self, instance, condition):
+        """Update the instance to the database
+
+        :param instance: an instance of modeled data object
+        :param condition: condition evaluated to determine record(s) to update
+        :returns: record id updated or None
+        :rtype: int
+        """
+        item = self.db.get(condition)
+        if item is None:
+            return None
+        item.update(instance.as_dict())
+        self.db.update(item, condition)
+        return item.eid
+
+    def create(self, instance):
+        """Create the instance to the database
+
+        :param instance: an instance of modeled data object
+        :returns: record id of created record
+        :rtype: int
+        """
+        return self.db.insert(instance.as_dict())
 
     def save(self, instance):
-        """Save the instance to the database
+        """Save (create or update) the instance to the database
 
         :param instance: an instance of modeled data object
         """
-        instance.save(self._engine_facade.session)
-        return instance
+        cond = tinydb.where('original') == instance.original
+        eid = self.update(instance, cond)
+        if eid is None:
+            return self.create(instance)
+        return eid

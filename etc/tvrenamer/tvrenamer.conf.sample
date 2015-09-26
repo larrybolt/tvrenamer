@@ -90,15 +90,8 @@
 # From tvrenamer.opts
 #
 
-# The connection string used to connect to the database (string value)
-#connection = sqlite:///$config_dir/cache.db
-
-# Timeout before idle sql connections are reaped (integer value)
-#idle_timeout = 3600
-
-# Verbosity of SQL debugging information. 0=None, 100=All (integer
-# value)
-#connection_debug = 0
+# The full path of the database storage. (string value)
+#dbfile = $config_dir/cache.json
 
 
 [trakt]

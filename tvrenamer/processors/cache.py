@@ -28,6 +28,6 @@ class CacheResults(base.ResultProcessorBase):
         """
         for res in data:
             try:
-                cache.save(res)
+                cache.dbapi().save(res)
             except Exception:
                 LOG.exception('failed to cache result: %s', res.status)

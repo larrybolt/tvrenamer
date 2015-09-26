@@ -12,23 +12,6 @@ tvrenamer.cache.api module
     :undoc-members:
     :show-inheritance:
 
-tvrenamer.cache.models module
------------------------------
-
-.. automodule:: tvrenamer.cache.models
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tvrenamer.cache.session module
-------------------------------
-
-.. automodule:: tvrenamer.cache.session
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

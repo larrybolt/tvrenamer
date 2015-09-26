@@ -15,10 +15,8 @@ class ProcessorBaseTests(base.BaseTest):
     def setUp(self):
         super(ProcessorBaseTests, self).setUp()
 
-        dbfile = os.path.join(tempfile.mkdtemp(), 'cache.db')
-        self.CONF.set_override('connection',
-                               'sqlite:///' + dbfile,
-                               'cache')
+        dbfile = os.path.join(tempfile.mkdtemp(), 'cache.json')
+        self.CONF.set_override('dbfile', dbfile, 'cache')
 
     def _make_data(self):
         results = []

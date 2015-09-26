@@ -69,6 +69,22 @@ class Episode(object):
         self.messages = []
         self.state = const.INIT
 
+    def as_dict(self):
+        return {'original': self.original,
+                'name': self.name,
+                'location': self.location,
+                'extension': self.extension,
+                'clean_name': self.clean_name,
+                'episode_numbers': self.episode_numbers,
+                'episode_names': self.episode_names,
+                'season_number': self.season_number,
+                'series_name': self.series_name,
+                'formatted_filename': self.formatted_filename,
+                'formatted_dirname': self.formatted_dirname,
+                'state': self.state,
+                'messages': self.messages
+                }
+
     def __str__(self):
         return ('{0} => [{1} {2}|{3} {4}] '
                 'meta: [{5} S{6} E{7}] '
