@@ -20,11 +20,8 @@ Automatic TV Episode Renamer
 Features
 --------
 
-* Rename TV episodes
-* Naming enrichment using data services
-    * http://thetvdb.com/
-    * http://trakt.tv/
-* Processing changes cached
-* Deploy as python library or Docker Container
-
++ Rename TV episodes
++ Naming enrichment using Available Data Services
++ Processing changes cached
++ Deploy as python library or Docker Container
 
