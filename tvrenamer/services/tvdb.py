@@ -14,7 +14,16 @@ def _as_str(error):
 
 
 class TvdbService(base.Service):
-    """Provides access thetvdb data service to lookup TV Series information."""
+    """Provides access thetvdb data service to lookup TV Series information.
+
+    `TheTVDB.com <http://thetvdb.com/>`_
+
+    Services used from thetvdb:
+
+    - search series by name
+    - lookup series by id
+    - get episode name(s) by season number and episode number(s)
+    """
 
     def __init__(self):
         super(TvdbService, self).__init__()

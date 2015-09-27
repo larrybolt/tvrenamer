@@ -45,7 +45,16 @@ def list_opts():
 
 
 class TraktService(base.Service):
-    """Provides access trakt data service to lookup TV Series information."""
+    """Provides access trakt data service to lookup TV Series information.
+
+    `Trakt.tv <http://trakt.tv/>`_
+
+    Services used from trakt:
+
+    - search series by name
+    - lookup series by id
+    - get episode name(s) by season number and episode number(s)
+    """
 
     def __init__(self):
         super(TraktService, self).__init__()
