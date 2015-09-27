@@ -2,7 +2,6 @@ import logging
 import os
 import re
 
-import eventlet
 from oslo_config import cfg
 import six
 
@@ -113,21 +112,3 @@ def retrieve_files():
                     all_files.append(filepath)
 
     return all_files
-
-
-class FileWatcher(object):
-
-    def __init__(self):
-        self._history = set()
-
-    def run(self):
-        new_files = []
-        while True:
-            new_files = set(retrieve_files()) - self._history
-            if new_files:
-                self._history.update(new_files)
-                break
-            else:
-                eventlet.greenthread.sleep(60)
-
-        return new_files

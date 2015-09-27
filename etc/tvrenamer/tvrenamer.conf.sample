@@ -10,11 +10,11 @@
 # Practice run where no changes are applied. (boolean value)
 #dryrun = false
 
-# Disable console output when running via cron (boolean value)
-#cron = false
-
 # Enable caching results (boolean value)
-#cache_enabled = false
+#cache_enabled = true
+
+# Enable console output (boolean value)
+#console_output_enabled = true
 
 # specify name of log file default: %(default)s (string value)
 #logfile = tvrenamer.log

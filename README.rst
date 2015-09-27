@@ -22,8 +22,8 @@ Features
 
 * Rename TV episodes
 * Naming enrichment using data services
-        * http://thetvdb.com/
-        * http://trakt.tv/
+    * http://thetvdb.com/
+    * http://trakt.tv/
 * Processing changes cached
 * Deploy as python library or Docker Container
 

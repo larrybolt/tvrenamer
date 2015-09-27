@@ -17,6 +17,7 @@ logging.getLogger().addHandler(logging.NullHandler())
 DEFAULT_LIBRARY_LOG_LEVEL = {'stevedore': logging.WARNING,
                              'requests': logging.WARNING,
                              'tvdbapi_client': logging.WARNING,
+                             'trakt': logging.WARNING,
                              }
 CONSOLE_MESSAGE_FORMAT = '%(message)s'
 LOG_FILE_MESSAGE_FORMAT = '[%(asctime)s] %(levelname)-8s %(name)s %(message)s'
@@ -35,7 +36,7 @@ def _setup_logging():
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
 
-    if not cfg.CONF.cron:
+    if cfg.CONF.console_output_enabled:
         # Always send higher-level messages to the console via stderr
         console = logging.StreamHandler(sys.stderr)
         formatter = logging.Formatter(CONSOLE_MESSAGE_FORMAT)

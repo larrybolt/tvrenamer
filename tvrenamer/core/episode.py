@@ -4,7 +4,6 @@ information from a data service.
 
 Available actions on the Episode:
 
-    - validate: verify file has potential to be a TV Episode
     - parse: retrieve information about TV Episode from elements of name
     - enhance: lookup additional information based on parsed elements
     - rename: change the name of file based on most up-to-date info

@@ -41,7 +41,7 @@ class ProcessorBaseTests(base.BaseTest):
 
     def test_noop_only(self):
         self.CONF.set_override('cache_enabled', False)
-        self.CONF.set_override('cron', True)
+        self.CONF.set_override('console_output_enabled', False)
         processor_mgr = processors.load()
         exts = processor_mgr.sorted_extensions()
 
@@ -51,7 +51,7 @@ class ProcessorBaseTests(base.BaseTest):
 
     def test_printer(self):
         self.CONF.set_override('cache_enabled', False)
-        self.CONF.set_override('cron', False)
+        self.CONF.set_override('console_output_enabled', True)
         processor_mgr = processors.load()
         exts = processor_mgr.sorted_extensions()
 
@@ -61,7 +61,7 @@ class ProcessorBaseTests(base.BaseTest):
 
     def test_cache(self):
         self.CONF.set_override('cache_enabled', True)
-        self.CONF.set_override('cron', True)
+        self.CONF.set_override('console_output_enabled', False)
         processor_mgr = processors.load()
         exts = processor_mgr.sorted_extensions()
 
@@ -71,7 +71,7 @@ class ProcessorBaseTests(base.BaseTest):
 
     def test_all(self):
         self.CONF.set_override('cache_enabled', True)
-        self.CONF.set_override('cron', False)
+        self.CONF.set_override('console_output_enabled', True)
         processor_mgr = processors.load()
         exts = processor_mgr.sorted_extensions()
 
@@ -82,7 +82,7 @@ class ProcessorBaseTests(base.BaseTest):
 
     def test_execute_all(self):
         self.CONF.set_override('cache_enabled', True)
-        self.CONF.set_override('cron', False)
+        self.CONF.set_override('console_output_enabled', True)
         processor_mgr = processors.load()
 
         with mock.patch.object(cache.CacheResults, 'process',

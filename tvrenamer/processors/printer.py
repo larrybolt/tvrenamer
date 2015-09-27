@@ -20,7 +20,8 @@ class PrintResults(base.ResultProcessorBase):
     @property
     def enabled(self):
         """Determines if a processor plugin is enabled for processing data."""
-        return LOG.isEnabledFor(logging.INFO) and not cfg.CONF.cron
+        return (LOG.isEnabledFor(logging.INFO) and
+                cfg.CONF.console_output_enabled)
 
     def process(self, data):
         """Process the results from episode processing.

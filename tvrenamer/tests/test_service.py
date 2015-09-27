@@ -15,7 +15,7 @@ class ServiceTest(base.BaseTest):
 
     cfg_data = []
     cfg_data.append('[DEFAULT]\n')
-    cfg_data.append('#cron = false\n')
+    cfg_data.append('#console_output_enabled = true\n')
     cfg_data.append('#default_library =\n')
     cfg_data.append('#directory_name_format = .\n')
     cfg_data.append('#dryrun = false\n')
@@ -60,7 +60,7 @@ class ServiceTest(base.BaseTest):
                     matchers.IsInstance(logging.StreamHandler),
                     matchers.IsInstance(logging.NullHandler)))
 
-    def test_setup_logging_no_logfile(self):
+    def test_setup_logging_console(self):
         self.CONF.set_override('logfile', None)
         del logging.getLogger().handlers[:]
         service._setup_logging()
@@ -71,8 +71,8 @@ class ServiceTest(base.BaseTest):
                     matchers.IsInstance(logging.StreamHandler),
                     matchers.IsInstance(logging.NullHandler)))
 
-    def test_setup_logging_cron(self):
-        self.CONF.set_override('cron', True)
+    def test_setup_logging_logfile(self):
+        self.CONF.set_override('console_output_enabled', False)
         del logging.getLogger().handlers[:]
         service._setup_logging()
         for hndler in logging.getLogger().handlers:
@@ -84,7 +84,7 @@ class ServiceTest(base.BaseTest):
 
     def test_setup_logging_no_logging(self):
         self.CONF.set_override('logfile', None)
-        self.CONF.set_override('cron', True)
+        self.CONF.set_override('console_output_enabled', False)
         del logging.getLogger().handlers[:]
         service._setup_logging()
         for hndler in logging.getLogger().handlers:
@@ -92,6 +92,10 @@ class ServiceTest(base.BaseTest):
                 hndler,
                 matchers.MatchesAny(
                     matchers.IsInstance(logging.NullHandler)))
+
+    def test_configure_no_config_file(self):
+        service._configure([])
+        self.assertTrue(True)
 
     def test_configure_with_venv(self):
 
