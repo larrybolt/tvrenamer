@@ -11,6 +11,3 @@ script:
   - flake8
   - nosetests --with-coverage --cover-package=tvrenamer
 after_success: coveralls
-addons:
-    code_climate:
-        repo_token: df347a5584c6c41b03f54a54f3618eedbc2a21e99440caab0afafda76bc77108
