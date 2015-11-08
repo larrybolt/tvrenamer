@@ -20,15 +20,8 @@ Automatic TV Episode Renamer
 Features
 --------
 
-* rename tv episodes
-
-
-Notes
------
-
-Inspired by the following:
- 
-* `tvrenamr <https://github.com/ghickman/tvrenamr](https://github.com/ghickman/tvrenamr/>`_
-* `tvnamer <https://github.com/dbr/tvnamer](https://github.com/dbr/tvnamer/>`_
-
++ Rename TV episodes
++ Naming enrichment using Available Data Services
++ Processing changes cached
++ Deploy as python library or Docker Container
 

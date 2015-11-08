@@ -10,7 +10,7 @@ class PrintProcessorTests(base.BaseTest):
 
     def setUp(self):
         super(PrintProcessorTests, self).setUp()
-        self.CONF.set_override('cron', False)
+        self.CONF.set_override('console_output_enabled', True)
         self.processor = printer.PrintResults()
 
     def _make_data(self):

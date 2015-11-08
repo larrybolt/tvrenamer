@@ -1,8 +1,6 @@
 """Application constants."""
 
 INIT = 'initialized'
-PREVALID = 'validating'
-POSTVALID = 'validated'
 PREPARSE = 'parsing'
 POSTPARSE = 'parsed'
 PREENHANCE = 'enhancing'

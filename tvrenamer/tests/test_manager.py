@@ -11,13 +11,7 @@ class ManagerTests(base.BaseTest):
         super(ManagerTests, self).setUp()
 
     def test_run(self):
-        self.CONF.set_override('cron', False)
         with mock.patch.object(manager, '_start') as mock_start:
-            manager.run()
-            self.assertTrue(mock_start.called)
-
-        self.CONF.set_override('cron', True)
-        with mock.patch.object(manager._service, 'launch') as mock_start:
             manager.run()
             self.assertTrue(mock_start.called)
 

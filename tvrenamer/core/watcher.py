@@ -2,9 +2,7 @@ import logging
 import os
 import re
 
-import eventlet
 from oslo_config import cfg
-import six
 
 LOG = logging.getLogger(__name__)
 
@@ -20,13 +18,15 @@ def _is_valid_extension(extension):
     if not cfg.CONF.valid_extensions:
         return True
 
+    valid = False
     for cext in cfg.CONF.valid_extensions:
         if not cext.startswith('.'):
             cext = '.%s' % cext
         if extension == cext:
-            return True
-    else:
-        return False
+            valid = True
+            break
+
+    return valid
 
 
 def _is_blacklisted_filename(filepath):
@@ -61,30 +61,30 @@ def _is_blacklisted_filename(filepath):
         return False
 
     filename = os.path.basename(filepath)
-    fname, fext = os.path.splitext(filename)
+    fname = os.path.splitext(filename)[0]
 
+    blacklisted = False
     for fblacklist in cfg.CONF.filename_blacklist:
-        if isinstance(fblacklist, six.string_types):
-            if filename == fblacklist:
-                return True
-            continue  # pragma: no cover
 
-        if fblacklist.get('full_path'):
-            to_check = filepath
-        else:
+        if isinstance(fblacklist, dict):
+            to_check = filename
             if fblacklist.get('exclude_extension', False):
                 to_check = fname
-            else:
-                to_check = filename
+            if fblacklist.get('full_path', False):
+                to_check = filepath
 
-        if fblacklist.get('is_regex', False):
-            if re.match(fblacklist['match'], to_check) is not None:
-                return True
+            if fblacklist.get('is_regex', False):
+                blacklisted = re.match(fblacklist['match'],
+                                       to_check) is not None
+            else:
+                blacklisted = (fblacklist['match'] in to_check)
         else:
-            if fblacklist['match'] in to_check:
-                return True
-    else:
-        return False
+            blacklisted = (filename == fblacklist)
+
+        if blacklisted:
+            break
+
+    return blacklisted
 
 
 def retrieve_files():
@@ -103,7 +103,7 @@ def retrieve_files():
             location = os.path.abspath(os.path.expanduser(location))
 
         LOG.debug('searching [%s]', location)
-        for root, dirs, files in os.walk(location):
+        for root, _, files in os.walk(location):
             LOG.debug('found file(s) %s', files)
             for name in files:
                 filepath = os.path.join(root, name)
@@ -113,21 +113,3 @@ def retrieve_files():
                     all_files.append(filepath)
 
     return all_files
-
-
-class FileWatcher(object):
-
-    def __init__(self):
-        self._history = set()
-
-    def run(self):
-        new_files = []
-        while True:
-            new_files = set(retrieve_files()) - self._history
-            if new_files:
-                self._history.update(new_files)
-                break
-            else:
-                eventlet.greenthread.sleep(60)
-
-        return new_files

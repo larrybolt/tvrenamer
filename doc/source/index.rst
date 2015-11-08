@@ -1,10 +1,12 @@
 .. include:: ../../README.rst
 
-Contents:
+
+**Contents:**
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
+    getting_started
     services
     results_processors
     options
@@ -12,9 +14,11 @@ Contents:
     ChangeLog
 
 
-Indices and tables
-------------------
+.. only:: html
 
-* :ref:`genindex`
-* :ref:`search`
+    Indices and tables
+    ------------------
+
+    * :ref:`genindex`
+    * :ref:`search`
 

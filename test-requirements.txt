@@ -5,7 +5,7 @@ tox>=1.7.2
 hacking
 
 # test coverage
-coverage>=3.6
+coverage>=4.0
 coveralls
 
 # Docs Requirements

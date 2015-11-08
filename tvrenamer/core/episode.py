@@ -4,7 +4,6 @@ information from a data service.
 
 Available actions on the Episode:
 
-    - validate: verify file has potential to be a TV Episode
     - parse: retrieve information about TV Episode from elements of name
     - enhance: lookup additional information based on parsed elements
     - rename: change the name of file based on most up-to-date info
@@ -69,6 +68,22 @@ class Episode(object):
         self.messages = []
         self.state = const.INIT
 
+    def as_dict(self):
+        return {'original': self.original,
+                'name': self.name,
+                'location': self.location,
+                'extension': self.extension,
+                'clean_name': self.clean_name,
+                'episode_numbers': self.episode_numbers,
+                'episode_names': self.episode_names,
+                'season_number': self.season_number,
+                'series_name': self.series_name,
+                'formatted_filename': self.formatted_filename,
+                'formatted_dirname': self.formatted_dirname,
+                'state': self.state,
+                'messages': self.messages
+                }
+
     def __str__(self):
         return ('{0} => [{1} {2}|{3} {4}] '
                 'meta: [{5} S{6} E{7}] '
@@ -126,8 +141,8 @@ class Episode(object):
                 'formatted_filename': self.out_location,
                 'state': self.state,
                 'messages': '\n\t'.join(self.messages),
-                }
             }
+        }
 
     @state(pre=const.PREPARSE, post=const.POSTPARSE)
     def parse(self):

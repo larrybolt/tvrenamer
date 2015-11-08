@@ -2,40 +2,37 @@ import os
 
 import testtools
 
-from tvrenamer.services import tvdb
+from tvrenamer.services import trakt_service
 from tvrenamer.tests import base
 
 
 def disabled():
-    return not os.environ.get('TEST_TVDB_API_KEY') or not os.environ.get(
-        'TEST_TVDB_API_USER') or not os.environ.get('TEST_TVDB_API_PASSWORD')
+    return not os.environ.get('TEST_TRAKT_CLIENT_ID') or not os.environ.get(
+        'TEST_TRAKT_CLIENT_SECRET')
 
 
-class TvdbServiceTest(base.BaseTest):
+class TraktServiceTest(base.BaseTest):
 
     def setUp(self):
-        super(TvdbServiceTest, self).setUp()
+        super(TraktServiceTest, self).setUp()
 
-        self.CONF.set_override('apikey',
-                               os.environ.get('TEST_TVDB_API_KEY'),
-                               'tvdb')
-        self.CONF.set_override('username',
-                               os.environ.get('TEST_TVDB_API_USER'),
-                               'tvdb')
-        self.CONF.set_override('userpass',
-                               os.environ.get('TEST_TVDB_API_PASSWORD'),
-                               'tvdb')
-        self.CONF.set_override('select_first',
-                               True,
-                               'tvdb')
-        self.api = tvdb.TvdbService()
+        self.CONF.set_override('client_id',
+                               os.environ.get('TEST_TRAKT_CLIENT_ID'),
+                               'trakt')
+        self.CONF.set_override('client_secret',
+                               os.environ.get('TEST_TRAKT_CLIENT_SECRET'),
+                               'trakt')
+        self.api = trakt_service.TraktService()
+
+    def test_list_opts(self):
+        self.assertIsNotNone(trakt_service.list_opts())
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_series_by_name(self):
         series, err = self.api.get_series_by_name('The Big Bang Theory')
         self.assertIsNotNone(series)
         self.assertIsNone(err)
-        self.assertEqual(series['seriesName'], 'The Big Bang Theory')
+        self.assertEqual(series.title, 'The Big Bang Theory')
 
         series, err = self.api.get_series_by_name('Fake - Unknown Series')
         self.assertIsNone(series)
@@ -44,10 +41,10 @@ class TvdbServiceTest(base.BaseTest):
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_series_by_id(self):
-        series, err = self.api.get_series_by_id(80379)
+        series, err = self.api.get_series_by_id(1409)
         self.assertIsNotNone(series)
         self.assertIsNone(err)
-        self.assertEqual(series['seriesName'], 'The Big Bang Theory')
+        self.assertEqual(series.title, 'The Big Bang Theory')
 
         series, err = self.api.get_series_by_id(0)
         self.assertIsNone(series)
@@ -77,7 +74,8 @@ class TvdbServiceTest(base.BaseTest):
         episodes, eperr = self.api.get_episode_name(series, [1], 2)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertEqual(eperr, 'Not Found')
+        self.assertEqual(eperr,
+                         'Not Found - "method exists, but no record found"')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_attr_nf(self):
@@ -85,17 +83,20 @@ class TvdbServiceTest(base.BaseTest):
         episodes, eperr = self.api.get_episode_name(series, [1], 5)
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
-        self.assertEqual(eperr, 'Not Found')
+        self.assertEqual(eperr,
+                         'Not Found - "method exists, but no record found"')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_episode_nf(self):
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [25], 1)
         self.assertIsNone(episodes)
-        self.assertIsNone(eperr)
+        self.assertIsNotNone(eperr)
+        self.assertEqual(eperr,
+                         'Not Found - "method exists, but no record found"')
 
         series, err = self.api.get_series_by_name('Firefly')
-        episodes, eperr = self.api.get_episode_name(series, [15], 0)
+        episodes, eperr = self.api.get_episode_name(series, [1], 0)
         self.assertIsNotNone(episodes)
         self.assertIsNone(eperr)
         self.assertEqual(episodes, ['Serenity'])

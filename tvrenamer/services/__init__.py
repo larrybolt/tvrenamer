@@ -19,3 +19,4 @@ def get_service():
 def load_service_opts(conf):
     """Load configuration options for services."""
     conf.import_group('tvdb', 'tvdbapi_client.options')
+    conf.import_group('trakt', 'tvrenamer.services.trakt_service')

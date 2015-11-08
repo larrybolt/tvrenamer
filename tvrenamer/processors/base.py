@@ -32,8 +32,8 @@ class EnabledExtensionManager(enabled.EnabledExtensionManager):
 
     def map(self, func, *args, **kwds):
         response = []
-        for e in self.sorted_extensions():
-            self._invoke_one_plugin(response.append, func, e, args, kwds)
+        for ext in self.sorted_extensions():
+            self._invoke_one_plugin(response.append, func, ext, args, kwds)
         return response
 
 
@@ -41,15 +41,15 @@ class EnabledExtensionManager(enabled.EnabledExtensionManager):
 class ResultProcessorBase(object):
     """Abstract class that provides the structure of a result processor."""
 
-    @property
+    @abc.abstractproperty
     def priority(self):
         """Processor priority used for sorting to determine execution order."""
-        return 1
+        raise NotImplementedError
 
-    @property
+    @abc.abstractproperty
     def enabled(self):
         """Determines if a processor plugin is enabled for processing data."""
-        return True
+        raise NotImplementedError
 
     @abc.abstractmethod
     def process(self, data):

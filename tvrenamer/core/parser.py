@@ -36,17 +36,19 @@ def parse_filename(filename):
     """
 
     _patterns = patterns.get_expressions()
+    result = {}
 
     for cmatcher in _patterns:
         match = cmatcher.match(filename)
         if match:
             namedgroups = match.groupdict().keys()
 
-            result = {}
             result['pattern'] = cmatcher.pattern
             result['series_name'] = match.group('seriesname')
             result['season_number'] = _get_season_no(match, namedgroups)
             result['episode_numbers'] = _get_episodes(match, namedgroups)
-            return result
+            break
     else:
-        return None
+        result = None
+
+    return result

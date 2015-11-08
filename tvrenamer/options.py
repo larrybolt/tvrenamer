@@ -13,12 +13,12 @@ CLI_OPTS = [
     cfg.BoolOpt('dryrun',
                 default=False,
                 help='Practice run where no changes are applied.'),
-    cfg.BoolOpt('cron',
-                default=False,
-                help='Disable console output when running via cron'),
     cfg.BoolOpt('cache_enabled',
-                default=False,
+                default=True,
                 help='Enable caching results'),
+    cfg.BoolOpt('console_output_enabled',
+                default=True,
+                help='Enable console output'),
     cfg.StrOpt('logfile',
                metavar='LOG_FILE',
                default=DEFAULT_LOG_FILENAME,
@@ -114,15 +114,9 @@ FORMAT_OPTS = [
 ]
 
 CACHE_OPTS = [
-    cfg.StrOpt('connection',
-               default='sqlite:///$config_dir/cache.db',
-               help='The connection string used to connect to the database'),
-    cfg.IntOpt('idle_timeout',
-               default=3600,
-               help='Timeout before idle sql connections are reaped'),
-    cfg.IntOpt('connection_debug',
-               default=0,
-               help='Verbosity of SQL debugging information. 0=None, 100=All'),
+    cfg.StrOpt('dbfile',
+               default='$config_dir/cache.json',
+               help='The full path of the database storage.'),
 ]
 
 

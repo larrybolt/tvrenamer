@@ -12,11 +12,8 @@ class CacheProcessorTests(base.BaseTest):
     def setUp(self):
         super(CacheProcessorTests, self).setUp()
 
-        dbfile = os.path.join(tempfile.mkdtemp(), 'cache.db')
-        self.CONF.set_override('connection',
-                               'sqlite:///' + dbfile,
-                               'cache')
-
+        dbfile = os.path.join(tempfile.mkdtemp(), 'cache.json')
+        self.CONF.set_override('dbfile', dbfile, 'cache')
         self.processor = cache.CacheResults()
 
     def _make_data(self):
@@ -40,7 +37,7 @@ class CacheProcessorTests(base.BaseTest):
         results.append(ep2)
         return results
 
-    @mock.patch('tvrenamer.cache.save')
+    @mock.patch('tvrenamer.cache.dbapi')
     def test_cache_result(self, mock_cache):
 
         self.CONF.set_override('cache_enabled', False)

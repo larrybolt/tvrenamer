@@ -9,12 +9,35 @@ LOG = logging.getLogger(__name__)
 
 
 def _as_str(error):
-    resp = getattr(error,  'response',  None)
+    resp = getattr(error, 'response', None)
     return str(error) if resp is None else resp.reason
 
 
+def _get_epname(episodes, epno, absolute=False):
+
+    epname = None
+    for eps in episodes:
+        if int(eps.get('airedEpisodeNumber', -1)) == int(epno):
+            epname = eps.get('episodeName')
+            break
+        if absolute and int(eps.get('absoluteNumber', -1)) == int(epno):
+            epname = eps.get('episodeName')
+            break
+
+    return epname
+
+
 class TvdbService(base.Service):
-    """Provides access thetvdb data service to lookup TV Series information."""
+    """Provides access thetvdb data service to lookup TV Series information.
+
+    `TheTVDB.com <http://thetvdb.com/>`_
+
+    Services used from thetvdb:
+
+    - search series by name
+    - lookup series by id
+    - get episode name(s) by season number and episode number(s)
+    """
 
     def __init__(self):
         super(TvdbService, self).__init__()
@@ -55,19 +78,6 @@ class TvdbService(base.Service):
         """
         return series.get('seriesName')
 
-    def _get_epname(self, episodes, epno, absolute=False):
-
-        epname = None
-        for ep in episodes:
-            if int(ep.get('airedEpisodeNumber', -1)) == int(epno):
-                epname = ep.get('episodeName')
-                break
-            if absolute and int(ep.get('absoluteNumber', -1)) == int(epno):
-                epname = ep.get('episodeName')
-                break
-
-        return epname
-
     def get_episode_name(self, series, episode_numbers, season_number):
         """Perform lookup for name of episode numbers for a given series.
 
@@ -87,9 +97,9 @@ class TvdbService(base.Service):
 
         epnames = []
         for epno in episode_numbers:
-            epname = self._get_epname(episodes, epno)
+            epname = _get_epname(episodes, epno)
             if epname is None:
-                epname = self._get_epname(episodes, epno, absolute=True)
+                epname = _get_epname(episodes, epno, absolute=True)
                 if epname is None:
                     return None, None
 

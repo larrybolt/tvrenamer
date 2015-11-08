@@ -10,14 +10,11 @@
 # Practice run where no changes are applied. (boolean value)
 #dryrun = false
 
-# Disable console output when running via cron (boolean value)
-#cron = false
-
 # Enable caching results (boolean value)
-#cache_enabled = false
+#cache_enabled = true
 
-# max processes to use for performing sync of torrents (integer value)
-#max_processes = 4
+# Enable console output (boolean value)
+#console_output_enabled = true
 
 # specify name of log file default: %(default)s (string value)
 #logfile = tvrenamer.log
@@ -93,15 +90,23 @@
 # From tvrenamer.opts
 #
 
-# The connection string used to connect to the database (string value)
-#connection = sqlite:///$config_dir/cache.db
+# The full path of the database storage. (string value)
+#dbfile = $config_dir/cache.json
 
-# Timeout before idle sql connections are reaped (integer value)
-#idle_timeout = 3600
 
-# Verbosity of SQL debugging information. 0=None, 100=All (integer
+[trakt]
+
+#
+# From trakt.opts
+#
+
+# client id from your trakt account ENV['TRAKT_CLIENT_ID'] (string
 # value)
-#connection_debug = 0
+#client_id = <None>
+
+# client secret from your trakt account ENV['TRAKT_CLIENT_SECRET']
+# (string value)
+#client_secret = <None>
 
 
 [tvdb]
