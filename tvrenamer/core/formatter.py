@@ -41,9 +41,9 @@ def clean_series_name(seriesname):
         return seriesname
     # TODO(xxxx): Could this be made to clean "Hawaii.Five-0.2010" into
     # "Hawaii Five-0 2010"?
-    seriesname = re.sub('(\D)[.](\D)', '\\1 \\2', seriesname)
-    seriesname = re.sub('(\D)[.]', '\\1 ', seriesname)
-    seriesname = re.sub('[.](\D)', ' \\1', seriesname)
+    seriesname = re.sub(r'(\D)[.](\D)', '\\1 \\2', seriesname)
+    seriesname = re.sub(r'(\D)[.]', '\\1 ', seriesname)
+    seriesname = re.sub(r'[.](\D)', ' \\1', seriesname)
     seriesname = seriesname.replace('_', ' ')
     seriesname = re.sub('-$', '', seriesname)
     return _replace_series_name(seriesname.strip(),
@@ -132,7 +132,7 @@ def _format_episode_name(names):
     epno = None
     numbers = []
     for cname in names:
-        match = re.match('(.*) \(([0-9]+)\)$', cname)
+        match = re.match(r'(.*) \(([0-9]+)\)$', cname)
         if found_name != '' and (not match or epname != found_name):
             # An episode didn't match
             return cfg.CONF.multiep_join_name_with.join(names)
@@ -260,7 +260,7 @@ def format_filename(series_name, season_number,
         'episode': _format_episode_numbers(episode_numbers),
         'episodename': tc.titlecase(_format_episode_name(episode_names)),
         'ext': extension,
-        }
+    }
 
     value = apply_replacements(
         cfg.CONF.filename_format_ep % epdata,
@@ -282,7 +282,7 @@ def format_dirname(series_name, season_number):
         'seriesname': _replace_series_name(
             series_name, cfg.CONF.output_series_replacements),
         'seasonnumber': season_number,
-        }
+    }
 
     return tc.titlecase(cfg.CONF.directory_name_format % data)
 

@@ -110,13 +110,13 @@ class TraktService(base.Service):
         epnames = []
         for epno in episode_numbers:
             try:
-                ep = trakt.Trakt['shows'].episode(
+                episode = trakt.Trakt['shows'].episode(
                     series_id, season_number, epno, exceptions=True)
             except exceptions.RequestError as err:
                 LOG.exception('fetch episode %s S%sE%s failed',
                               series_id, season_number, epno)
                 return None, str(err)
 
-            epnames.append(ep.title)
+            epnames.append(episode.title)
 
         return epnames, None

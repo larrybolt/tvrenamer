@@ -141,8 +141,8 @@ class Episode(object):
                 'formatted_filename': self.out_location,
                 'state': self.state,
                 'messages': '\n\t'.join(self.messages),
-                }
             }
+        }
 
     @state(pre=const.PREPARSE, post=const.POSTPARSE)
     def parse(self):

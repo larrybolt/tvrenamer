@@ -16,11 +16,11 @@ class DatabaseAPI(object):
         :type conf: oslo_config.cfg.ConfigOpts
         """
         self.conf = conf
-        self.db = tinydb.TinyDB(conf.cache.dbfile)
+        self.dbi = tinydb.TinyDB(conf.cache.dbfile)
 
     def clear(self):
         """Clear database."""
-        self.db.purge_tables()
+        self.dbi.purge_tables()
 
     def update(self, instance, condition):
         """Update the instance to the database
@@ -30,11 +30,11 @@ class DatabaseAPI(object):
         :returns: record id updated or None
         :rtype: int
         """
-        item = self.db.get(condition)
+        item = self.dbi.get(condition)
         if item is None:
             return None
         item.update(instance.as_dict())
-        self.db.update(item, condition)
+        self.dbi.update(item, condition)
         return item.eid
 
     def create(self, instance):
@@ -44,7 +44,7 @@ class DatabaseAPI(object):
         :returns: record id of created record
         :rtype: int
         """
-        return self.db.insert(instance.as_dict())
+        return self.dbi.insert(instance.as_dict())
 
     def save(self, instance):
         """Save (create or update) the instance to the database
