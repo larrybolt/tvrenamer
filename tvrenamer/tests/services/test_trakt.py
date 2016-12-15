@@ -75,7 +75,7 @@ class TraktServiceTest(base.BaseTest):
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
         self.assertEqual(eperr,
-                         'Not Found - "method exists, but no record found"')
+                         'Not Found - "Method exists, but no record found"')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_attr_nf(self):
@@ -84,7 +84,7 @@ class TraktServiceTest(base.BaseTest):
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
         self.assertEqual(eperr,
-                         'Not Found - "method exists, but no record found"')
+                         'Not Found - "Method exists, but no record found"')
 
     @testtools.skipIf(disabled(), 'live api testing disabled')
     def test_get_episode_name_episode_nf(self):
@@ -93,7 +93,7 @@ class TraktServiceTest(base.BaseTest):
         self.assertIsNone(episodes)
         self.assertIsNotNone(eperr)
         self.assertEqual(eperr,
-                         'Not Found - "method exists, but no record found"')
+                         'Not Found - "Method exists, but no record found"')
 
         series, err = self.api.get_series_by_name('Firefly')
         episodes, eperr = self.api.get_episode_name(series, [1], 0)
