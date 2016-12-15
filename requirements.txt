@@ -6,9 +6,8 @@ lockfile
 six>=1.9.0
 stevedore>=1.5.0
 titlecase>=0.7.2
-tinydb<3.1,>=3.0
+tinydb>=3.2.0
 PrettyTable<0.8,>=0.7
 
 trakt.py>=2.5.1
-tvdbapi_client>=0.1.4
-
+tvdbapi_client>=0.1.5
